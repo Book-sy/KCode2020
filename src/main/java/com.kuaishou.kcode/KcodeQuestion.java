@@ -24,7 +24,6 @@ public class KcodeQuestion {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
         try {
-            Date start = new Date();
             while ((line = br.readLine()) != null) {
                 String[] a = line.split(",");
                 String key = a[1];
@@ -46,11 +45,7 @@ public class KcodeQuestion {
                         z.add(Integer.parseInt(a[2]));
                     }
                 }
-                if(++num%1000000==0) {
-                    System.out.println("成功读取" + num + "条数据，总耗时" + (new Date().getTime() - start.getTime()) + "ms");
-                }
             }
-            System.out.println("读取完毕，总共"+num+"条数据(我太难了)，总耗时"+(new Date().getTime()-start.getTime())+"ms");
         } catch (IOException e){
             e.printStackTrace();
         } finally {
