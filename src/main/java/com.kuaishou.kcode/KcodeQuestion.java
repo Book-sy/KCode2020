@@ -2,6 +2,7 @@ package com.kuaishou.kcode;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author kcode
@@ -11,11 +12,12 @@ public class KcodeQuestion {
 
     private Map<String, Map<Integer, List<Integer>>> map = new HashMap();
 
+
     private static long REDUCEVALUE = 1589700000000L;
     private static long num = 0;
 
     /**
-     * prepare() æ–¹æ³•ç”¨æ¥æ¥å—è¾“å…¥æ•°æ®é›†ï¼Œæ•°æ®é›†æ ¼å¼å‚è€ƒREADME.md
+     * prepare() ·½·¨ÓÃÀ´½ÓÊÜÊäÈëÊı¾İ¼¯£¬Êı¾İ¼¯¸ñÊ½²Î¿¼README.md
      *
      * @param inputStream
      */
@@ -24,29 +26,64 @@ public class KcodeQuestion {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         String line = null;
         try {
+            List<String> data = new ArrayList<>();
+
+            ExecutorService es = Executors.newFixedThreadPool(12);
+
             while ((line = br.readLine()) != null) {
-                String[] a = line.split(",");
-                String key = a[1];
-                long time = Long.parseLong(a[0]);
-                Map<Integer, List<Integer>> list = map.get(key);
-                if(list==null){
-                    list = new HashMap();
-                    List z = new ArrayList();
-                    z.add(Integer.parseInt(a[2]));
-                    list.put((int)(time/1000), z);
-                    map.put(key, list);
-                } else {
-                    List z = list.get((int)(time/1000));
-                    if(z == null){
-                        z = new ArrayList();
-                        z.add(Integer.parseInt(a[2]));
-                        list.put((int)(time/1000), z);
-                    } else {
-                        z.add(Integer.parseInt(a[2]));
-                    }
+                data.add(line);
+
+                if(++num%100000==0){
+                    List<String> finalData = data;
+                    es.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            Map<String, Map<Integer, List<Integer>>> map = new HashMap();
+                            for(String line: finalData){
+                                String[] a = line.split(",");
+                                String key = a[1];
+                                long time = Long.parseLong(a[0]);
+                                Map<Integer, List<Integer>> list = map.get(key);
+                                if (list == null) {
+                                    list = new HashMap();
+                                    List z = new ArrayList();
+                                    z.add(Integer.parseInt(a[2]));
+                                    list.put((int) (time / 1000), z);
+                                    map.put(key, list);
+                                } else {
+                                    List z = list.get((int) (time / 1000));
+                                    if (z == null) {
+                                        z = new ArrayList();
+                                        z.add(Integer.parseInt(a[2]));
+                                        list.put((int) (time / 1000), z);
+                                    } else {
+                                        z.add(Integer.parseInt(a[2]));
+                                    }
+                                }
+                            }
+                            //ÃÛÖ­´úÂë£¬¾ÍÄáÂêÀëÆ×(ÎÒ²»Ğ´×¢ÊÍ£¬ÄÜ¿´¶®µÄ¶¼ÊÇÉñÏÉ£¬Ò»¶¨Òª¸æËßÎÒ£¬ÎÒÈ¥Ä¤°İ)
+                            synchronized (KcodeQuestion.this){
+                                for(String i:map.keySet()){
+                                    if(KcodeQuestion.this.map.get(i)==null){
+                                        KcodeQuestion.this.map.put(i,map.get(i));
+                                    } else {
+                                        for(Integer j:map.get(i).keySet()){
+                                            if(KcodeQuestion.this.map.get(i).get(j)==null){
+                                                KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
+                                            } else {
+                                                KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    data = new ArrayList<>();
                 }
             }
-        } catch (IOException e){
+            es.shutdown();
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -59,38 +96,38 @@ public class KcodeQuestion {
     }
 
     /**
-     * getResult() æ–¹æ³•æ˜¯ç”±kcodeè¯„æµ‹ç³»ç»Ÿè°ƒç”¨ï¼Œæ˜¯è¯„æµ‹ç¨‹åºæ­£ç¡®æ€§çš„ä¸€éƒ¨åˆ†ï¼Œè¯·æŒ‰ç…§é¢˜ç›®è¦æ±‚è¿”å›æ­£ç¡®æ•°æ®
-     * è¾“å…¥æ ¼å¼å’Œè¾“å‡ºæ ¼å¼å‚è€ƒ README.md
+     * getResult() ·½·¨ÊÇÓÉkcodeÆÀ²âÏµÍ³µ÷ÓÃ£¬ÊÇÆÀ²â³ÌĞòÕıÈ·ĞÔµÄÒ»²¿·Ö£¬Çë°´ÕÕÌâÄ¿ÒªÇó·µ»ØÕıÈ·Êı¾İ
+     * ÊäÈë¸ñÊ½ºÍÊä³ö¸ñÊ½²Î¿¼ README.md
      *
-     * @param timestamp ç§’çº§æ—¶é—´æˆ³
-     * @param methodName æ–¹æ³•åç§°
+     * @param timestamp  Ãë¼¶Ê±¼ä´Á
+     * @param methodName ·½·¨Ãû³Æ
      */
     public String getResult(Long timestamp, String methodName) {
-        int QPS,P99,P50,AVG,MAX;
+        int QPS, P99, P50, AVG, MAX;
         List<Integer> cz = map.get(methodName).get(timestamp.intValue());
         Collections.sort(cz);
         QPS = cz.size();
 
-        P99 = getPoint(cz,0.99);
+        P99 = getPoint(cz, 0.99);
         P50 = getPoint(cz, 0.5);
 
 
         int sum = 0;
-        for(int z:cz)
-            sum+=z;
-        AVG = (int)Math.ceil(1.0*sum/QPS);
-        MAX = cz.get(QPS-1);
+        for (int z : cz)
+            sum += z;
+        AVG = (int) Math.ceil(1.0 * sum / QPS);
+        MAX = cz.get(QPS - 1);
 
-        return QPS+","+P99+","+P50+","+AVG+","+MAX;
+        return QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX;
     }
 
-    private int getPoint(List<Integer> cz,double p){
-        double i = cz.size()*p;
-        if(i-(int)i == 0){
-            return cz.get((int)i-1);
+    private int getPoint(List<Integer> cz, double p) {
+        double i = cz.size() * p;
+        if (i - (int) i == 0) {
+            return cz.get((int) i - 1);
             //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
         } else {
-            return cz.get((int)Math.ceil(i-1));
+            return cz.get((int) Math.ceil(i - 1));
         }
     }
 }
