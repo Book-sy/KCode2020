@@ -28,7 +28,7 @@ public class KcodeQuestion {
         try {
             List<String> data = new ArrayList<>();
 
-            ExecutorService es = Executors.newFixedThreadPool(12);
+            ExecutorService es = Executors.newFixedThreadPool(16);
 
             while ((line = br.readLine()) != null) {
                 data.add(line);
@@ -103,13 +103,28 @@ public class KcodeQuestion {
      * @param methodName ·½·¨Ãû³Æ
      */
     public String getResult(Long timestamp, String methodName) {
+
         int QPS, P99, P50, AVG, MAX;
         List<Integer> cz = map.get(methodName).get(timestamp.intValue());
         Collections.sort(cz);
         QPS = cz.size();
 
-        P99 = getPoint(cz, 0.99);
-        P50 = getPoint(cz, 0.5);
+
+        double i = QPS * 0.99;
+        if (i - (int) i == 0) {
+            P99 =  cz.get((int) i - 1);
+            //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
+        } else {
+            P99 = cz.get((int) Math.ceil(i - 1));
+        }
+
+        i = QPS * 0.5;
+        if (i - (int) i == 0) {
+            P50 = cz.get((int) i - 1);
+            //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
+        } else {
+            P50 = cz.get((int) Math.ceil(i - 1));
+        }
 
 
         int sum = 0;
@@ -119,15 +134,5 @@ public class KcodeQuestion {
         MAX = cz.get(QPS - 1);
 
         return QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX;
-    }
-
-    private int getPoint(List<Integer> cz, double p) {
-        double i = cz.size() * p;
-        if (i - (int) i == 0) {
-            return cz.get((int) i - 1);
-            //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
-        } else {
-            return cz.get((int) Math.ceil(i - 1));
-        }
     }
 }
