@@ -12,6 +12,8 @@ public class KcodeQuestion {
 
     private Map<String, Map<Integer, List<Integer>>> map = new HashMap();
 
+    private Queue<Map<String, Map<Integer, List<Integer>>>> q = new LinkedList<>();
+
     private static final long REDUCEVALUE = 1589700000000L;
     private static long num = 0;
 
@@ -22,29 +24,73 @@ public class KcodeQuestion {
      */
     public void prepare(InputStream inputStream) {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        String line = null;
         try {
-            List<String> data = new ArrayList<>();
 
             ExecutorService es = Executors.newFixedThreadPool(16);
 
-            while ((line = br.readLine()) != null) {
-                data.add(line);
+            byte one[] = new byte[1024 * 33];
 
-                if(++num%50000==0){
-                    es.submit(new updataTest(data));
-                    data = new ArrayList<>();
+            Thread addData = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(true){
+                        Map<String, Map<Integer, List<Integer>>> map = q.poll();
+                        if(map == null){
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if((map = q.poll()) == null){
+                                break;
+                            }
+                        }
+                        for(String i:map.keySet()){
+                            if(KcodeQuestion.this.map.get(i)==null){
+                                KcodeQuestion.this.map.put(i,map.get(i));
+                            } else {
+                                for(Integer j:map.get(i).keySet()){
+                                    if(KcodeQuestion.this.map.get(i).get(j)==null){
+                                        KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
+                                    } else {
+                                        KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+            });
+            addData.start();
+
+            while (inputStream.read(one, 0, 1024 * 32) > 0) {
+
+                int next = 1024*32;
+
+                byte i;
+                while (true) {
+                    i = (byte) inputStream.read();
+                    if(i == '\n' || i ==-1)
+                        break;
+                    one[next++] = i;
+                }
+
+                es.submit(new updataTest(one));
+                one = new byte[1024 * 33];
             }
-            es.submit(new updataTest(data));
+
+
             es.shutdown();
             es.awaitTermination(60,TimeUnit.SECONDS);
+            addData.join();
+
+
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {
-                br.close();
+                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -95,16 +141,20 @@ public class KcodeQuestion {
 
     class updataTest implements Runnable{
 
-        private List<String> data;
+        private String data;
 
-        public updataTest(List<String> data) {
-            this.data = data;
+        public updataTest(byte[] data) {
+            this.data = new String(data);
         }
 
         @Override
         public void run() {
+
             Map<String, Map<Integer, List<Integer>>> map = new HashMap();
-            for(String line: data){
+            String[] datas = data.split("\u0000");
+            datas = datas[0].split("\n");
+            for(String line:datas){
+
                 String[] a = line.split(",");
                 String key = a[1];
                 long time = Long.parseLong(a[0]);
@@ -127,6 +177,10 @@ public class KcodeQuestion {
                 }
             }
             synchronized (KcodeQuestion.this) {
+                q.offer(map);
+            }
+            /**
+            synchronized (KcodeQuestion.this) {
                 for(String i:map.keySet()){
                     if(KcodeQuestion.this.map.get(i)==null){
                         KcodeQuestion.this.map.put(i,map.get(i));
@@ -140,7 +194,7 @@ public class KcodeQuestion {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }
