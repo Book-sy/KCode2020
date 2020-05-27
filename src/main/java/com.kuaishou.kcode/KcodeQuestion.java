@@ -126,7 +126,7 @@ public class KcodeQuestion {
                     }
                 }
             }
-            synchronized (KcodeQuestion.this){
+            synchronized (KcodeQuestion.this) {
                 for(String i:map.keySet()){
                     if(KcodeQuestion.this.map.get(i)==null){
                         KcodeQuestion.this.map.put(i,map.get(i));
