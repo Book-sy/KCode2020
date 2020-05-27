@@ -16,6 +16,7 @@ public class KcodeQuestion {
     private static long REDUCEVALUE = 1589700000000L;
     private static long num = 0;
 
+    private static long time = 0;
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
      *
@@ -34,54 +35,11 @@ public class KcodeQuestion {
                 data.add(line);
 
                 if(++num%100000==0){
-                    List<String> finalData = data;
-                    es.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            Map<String, Map<Integer, List<Integer>>> map = new HashMap();
-                            for(String line: finalData){
-                                String[] a = line.split(",");
-                                String key = a[1];
-                                long time = Long.parseLong(a[0]);
-                                Map<Integer, List<Integer>> list = map.get(key);
-                                if (list == null) {
-                                    list = new HashMap();
-                                    List z = new ArrayList();
-                                    z.add(Integer.parseInt(a[2]));
-                                    list.put((int) (time / 1000), z);
-                                    map.put(key, list);
-                                } else {
-                                    List z = list.get((int) (time / 1000));
-                                    if (z == null) {
-                                        z = new ArrayList();
-                                        z.add(Integer.parseInt(a[2]));
-                                        list.put((int) (time / 1000), z);
-                                    } else {
-                                        z.add(Integer.parseInt(a[2]));
-                                    }
-                                }
-                            }
-                            //蜜汁代码，就尼玛离谱(我不写注释，能看懂的都是神仙，一定要告诉我，我去膜拜)
-                            synchronized (KcodeQuestion.this){
-                                for(String i:map.keySet()){
-                                    if(KcodeQuestion.this.map.get(i)==null){
-                                        KcodeQuestion.this.map.put(i,map.get(i));
-                                    } else {
-                                        for(Integer j:map.get(i).keySet()){
-                                            if(KcodeQuestion.this.map.get(i).get(j)==null){
-                                                KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
-                                            } else {
-                                                KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    es.submit(new updataTest(data));
                     data = new ArrayList<>();
                 }
             }
+            es.submit(new updataTest(data));
             es.shutdown();
         } catch (IOException e) {
             e.printStackTrace();
@@ -134,5 +92,57 @@ public class KcodeQuestion {
         MAX = cz.get(QPS - 1);
 
         return QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX;
+    }
+
+    class updataTest implements Runnable{
+
+        private List<String> data;
+
+        public updataTest(List<String> data) {
+            this.data = data;
+        }
+
+        @Override
+        public void run() {
+            Map<String, Map<Integer, List<Integer>>> map = new HashMap();
+            for(String line: data){
+                String[] a = line.split(",");
+                String key = a[1];
+                long time = Long.parseLong(a[0]);
+                Map<Integer, List<Integer>> list = map.get(key);
+                if (list == null) {
+                    list = new HashMap();
+                    List z = new ArrayList();
+                    z.add(Integer.parseInt(a[2]));
+                    list.put((int) (time / 1000), z);
+                    map.put(key, list);
+                } else {
+                    List z = list.get((int) (time / 1000));
+                    if (z == null) {
+                        z = new ArrayList();
+                        z.add(Integer.parseInt(a[2]));
+                        list.put((int) (time / 1000), z);
+                    } else {
+                        z.add(Integer.parseInt(a[2]));
+                    }
+                }
+            }
+            //蜜汁代码，贼迷，就尼玛离谱(我不写注释，能看懂的都是神仙，一定要告诉我，我去膜拜)
+            synchronized (KcodeQuestion.this){
+                for(String i:map.keySet()){
+                    if(KcodeQuestion.this.map.get(i)==null){
+                        KcodeQuestion.this.map.put(i,map.get(i));
+                    } else {
+                        for(Integer j:map.get(i).keySet()){
+                            if(KcodeQuestion.this.map.get(i).get(j)==null){
+                                KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
+                            } else {
+                                KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
