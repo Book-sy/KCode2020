@@ -41,7 +41,8 @@ public class KcodeQuestion {
             }
             es.submit(new updataTest(data));
             es.shutdown();
-        } catch (IOException e) {
+            es.awaitTermination(60,TimeUnit.SECONDS);
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -127,7 +128,6 @@ public class KcodeQuestion {
                     }
                 }
             }
-            //蜜汁代码，贼迷，就尼玛离谱(我不写注释，能看懂的都是神仙，一定要告诉我，我去膜拜)
             synchronized (KcodeQuestion.this){
                 for(String i:map.keySet()){
                     if(KcodeQuestion.this.map.get(i)==null){
