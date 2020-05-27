@@ -12,11 +12,9 @@ public class KcodeQuestion {
 
     private Map<String, Map<Integer, List<Integer>>> map = new HashMap();
 
-
-    private static long REDUCEVALUE = 1589700000000L;
+    private static final long REDUCEVALUE = 1589700000000L;
     private static long num = 0;
 
-    private static long time = 0;
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
      *
@@ -34,7 +32,7 @@ public class KcodeQuestion {
             while ((line = br.readLine()) != null) {
                 data.add(line);
 
-                if(++num%100000==0){
+                if(++num%50000==0){
                     es.submit(new updataTest(data));
                     data = new ArrayList<>();
                 }
