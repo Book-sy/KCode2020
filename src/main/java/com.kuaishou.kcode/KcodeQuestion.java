@@ -111,7 +111,6 @@ public class KcodeQuestion {
                 es2.submit(new getResultTest((long) i));
                 //System.out.println("已着手处理"+i+"秒级数据");
             }
-
             es2.shutdown();
             es2.awaitTermination(60,TimeUnit.SECONDS);
 
@@ -236,7 +235,7 @@ public class KcodeQuestion {
                         }
                     }
                 }
-                    q.offer(map);
+                q.offer(map);
 
             }catch (Exception e){
                 e.printStackTrace();
