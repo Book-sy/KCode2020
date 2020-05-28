@@ -65,7 +65,7 @@ public class KcodeQuestion {
                 }
             });  */
 
-
+            /**
              new Thread(new Runnable() {
             @Override
             public void run() {
@@ -84,6 +84,7 @@ public class KcodeQuestion {
             }
             }
             }).start();
+             */
 
 
             Thread buffer = new Thread(new Runnable() {
