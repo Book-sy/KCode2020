@@ -129,7 +129,7 @@ public class KcodeQuestion {
                             }
                         }
                     }
-                    System.out.println("buffer已结束");
+                    //System.out.println("buffer已结束");
                 }
             });
 
