@@ -12,11 +12,7 @@ public class KcodeQuestion {
 
     private Map<Integer, Map<String, List>> map = new HashMap();
 
-    private Queue<Map<Integer, Map<String, List>>> q = new LinkedList<>();
-
-    private Map<Integer, int[]> timeHandle = new HashMap<>();
-
-    private Object lock = new Object();
+    private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
 
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
@@ -67,22 +63,22 @@ public class KcodeQuestion {
             });
 
             /**
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(!es.isShutdown()){
+             new Thread(new Runnable() {
+            @Override
+            public void run() {
+            while(!es.isShutdown()){
 
-                        ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                        int activeCount = tpe.getQueue().size();
-                        System.out.println("当前排队线程数："+ activeCount+"，总执行线程数:"+tpe.getCompletedTaskCount());
+            ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+            int activeCount = tpe.getQueue().size();
+            System.out.println("当前排队线程数："+ activeCount+"，总执行线程数:"+tpe.getCompletedTaskCount());
 
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+            try {
+            Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            e.printStackTrace();
+            }
+            }
+            }
             }).start();
              */
 
@@ -140,11 +136,11 @@ public class KcodeQuestion {
      */
     public String getResult(Long timestamp, String methodName){
         /**
-        int num = 0;
-        for(List i:map.get(1587987951).values()){
-            num+=i.size();
-        }
-        System.out.println(num);
+         int num = 0;
+         for(List i:map.get(1587987951).values()){
+         num+=i.size();
+         }
+         System.out.println(num);
          */
         try {
             return (String) map.get(timestamp.intValue()).get(methodName).get(0);
@@ -240,9 +236,8 @@ public class KcodeQuestion {
                         }
                     }
                 }
-                synchronized (KcodeQuestion.this) {
                     q.offer(map);
-                }
+
             }catch (Exception e){
                 e.printStackTrace();
             }
