@@ -10,9 +10,12 @@ import java.util.concurrent.*;
  */
 public class KcodeQuestion {
 
-    private Map<Integer, Map<String, List>> map = new HashMap();
+    private Map<Integer, Map<String, List>> map = new ConcurrentHashMap<>();
 
-    private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
+    //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
+    private ExecutorService es = Executors.newFixedThreadPool(16);
+
+    private Queue<byte[]> datas = new ConcurrentLinkedQueue<>();
 
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
@@ -23,8 +26,8 @@ public class KcodeQuestion {
 
         try {
 
-            ExecutorService es = Executors.newFixedThreadPool(16);
 
+            /**
             Thread addData = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -60,9 +63,9 @@ public class KcodeQuestion {
                         }
                     }
                 }
-            });
+            });  */
 
-            /**
+
              new Thread(new Runnable() {
             @Override
             public void run() {
@@ -71,6 +74,7 @@ public class KcodeQuestion {
             ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
             int activeCount = tpe.getQueue().size();
             System.out.println("当前排队线程数："+ activeCount+"，总执行线程数:"+tpe.getCompletedTaskCount());
+            System.out.println("剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"M");
 
             try {
             Thread.sleep(1000);
@@ -80,11 +84,57 @@ public class KcodeQuestion {
             }
             }
             }).start();
-             */
 
+
+            Thread buffer = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    int now = 1587987930;
+                    List<List> s = new ArrayList<>();
+                    while (true) {
+                        byte[] data = datas.poll();
+                        if(datas == null){
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if ((data = datas.poll()) == null) {
+                                break;
+                            }
+                        }
+                        for(String line:new String(data).replaceAll("\u0000","").split("\n")){
+                            String[] a = line.split(",");
+                            if(String.valueOf(Long.parseLong(a[0])/1000).equals(String.valueOf(now))){
+                                List l = new ArrayList();
+                                l.add(now);
+                                l.add(a[1]);
+                                l.add(Integer.parseInt(a[2]));
+                                s.add(l);
+                            } else {
+                                es.submit(new updataTest(s));
+                                s = new ArrayList<>();
+                                now = (int)(Long.parseLong(a[0])/1000);
+                                List l = new ArrayList();
+                                l.add(now);
+                                l.add(a[1]);
+                                l.add(Integer.parseInt(a[2]));
+                                s.add(l);
+                            }
+                        }
+                    }
+                    System.out.println("buffer已结束");
+                }
+            });
 
             byte one[] = new byte[1024 * 40];
-            addData.start();
+            buffer.start();
+            //addData.start();
             while (inputStream.read(one, 0, 1024 * 32) > 0) {
 
                 int next = 1024*32;
@@ -96,24 +146,27 @@ public class KcodeQuestion {
                         break;
                     one[next++] = i;
                 }
-
-                es.submit(new updataTest(one));
+                datas.offer(one);
                 one = new byte[1024 * 40];
             }
             //System.out.println("加载数据以读取完成");
-            addData.join();
+            //addData.join();
+            buffer.join();
             es.shutdown();
             es.awaitTermination(60,TimeUnit.SECONDS);
 
-
+            /**
+            long a = new Date().getTime();
             ExecutorService es2 = Executors.newFixedThreadPool(16);
             for(Integer i:map.keySet()) {
                 es2.submit(new getResultTest((long) i));
                 //System.out.println("已着手处理"+i+"秒级数据");
             }
+
             es2.shutdown();
             es2.awaitTermination(60,TimeUnit.SECONDS);
-
+            System.out.println("处理秒级数据时间："+(new Date().getTime()-a));
+             */
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -153,9 +206,11 @@ public class KcodeQuestion {
     private class getResultTest implements Runnable {
 
         private Long timestamp;
+        private Map<String, List> map;
 
-        public getResultTest(Long timestamp) {
+        public getResultTest(Long timestamp,Map<String, List> map) {
             this.timestamp = timestamp;
+            this.map = map;
         }
 
         @Override
@@ -163,8 +218,8 @@ public class KcodeQuestion {
 
 
             int QPS, P99, P50, AVG, MAX;
-            for (String q : map.get(timestamp.intValue()).keySet()) {
-                List cz = map.get(timestamp.intValue()).get(q);
+            for (String q : map.keySet()) {
+                List cz = map.get(q);
                 Collections.sort(cz);
                 QPS = cz.size();
 
@@ -195,47 +250,41 @@ public class KcodeQuestion {
                 cz.clear();
                 cz.add(""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
             }
+            KcodeQuestion.this.map.put((int)timestamp.longValue(),map);
         }
     }
 
     private class updataTest implements Runnable{
 
-        private String data;
+        private List<List> data;
 
-        public updataTest(byte[] data) {
-            this.data = new String(data);
+        public updataTest(List<List> data) {
+            this.data = data;
         }
 
         @Override
         public void run() {
 
             try {
-                Map<Integer, Map<String, List>> map = new HashMap();
-                String[] datas = data.replaceAll("\u0000", "").split("\n");
-                for (String line : datas) {
+                Map<String, List> map = new HashMap();
+                long time = 0;
+                for (List line : data) {
 
-                    String[] a = line.split(",");
-                    String key = a[1];
-                    long time = Long.parseLong(a[0]);
-                    Map<String, List> list = map.get((int) (time / 1000));
-                    if (list == null) {
-                        list = new HashMap();
-                        List z = new ArrayList();
-                        z.add(Integer.parseInt(a[2]));
-                        list.put(key, z);
-                        map.put((int) (time / 1000), list);
-                    } else {
-                        List z = list.get(key);
+                    String key = (String)line.get(1);
+                    time = (Integer)line.get(0);
+
+                        List z = map.get(key);
                         if (z == null) {
                             z = new ArrayList();
-                            z.add(Integer.parseInt(a[2]));
-                            list.put(key, z);
+                            z.add((int)line.get(2));
+                            map.put(key, z);
                         } else {
-                            z.add(Integer.parseInt(a[2]));
+                            z.add((int)line.get(2));
                         }
-                    }
+
                 }
-                q.offer(map);
+                //q.offer(map);
+                es.submit(new getResultTest(time,map));
 
             }catch (Exception e){
                 e.printStackTrace();
