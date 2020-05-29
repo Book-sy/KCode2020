@@ -15,7 +15,9 @@ public class KcodeQuestion {
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(16);
 
-    private Queue<byte[]> datas = new ConcurrentLinkedQueue<>();
+    private Queue<byte[]> datas = new LinkedList<>();
+
+    private static int ls;
 
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
@@ -87,54 +89,10 @@ public class KcodeQuestion {
              */
 
 
-            Thread buffer = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    int now = 1587987930;
-                    List<List> s = new ArrayList<>();
-                    while (true) {
-                        byte[] data = datas.poll();
-                        if(datas == null){
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            if ((data = datas.poll()) == null) {
-                                break;
-                            }
-                        }
-                        for(String line:new String(data).replaceAll("\u0000","").split("\n")){
-                            String[] a = line.split(",");
-                            if(String.valueOf(Long.parseLong(a[0])/1000).equals(String.valueOf(now))){
-                                List l = new ArrayList();
-                                l.add(now);
-                                l.add(a[1]);
-                                l.add(Integer.parseInt(a[2]));
-                                s.add(l);
-                            } else {
-                                es.submit(new updataTest(s));
-                                s = new ArrayList<>();
-                                now = (int)(Long.parseLong(a[0])/1000);
-                                List l = new ArrayList();
-                                l.add(now);
-                                l.add(a[1]);
-                                l.add(Integer.parseInt(a[2]));
-                                s.add(l);
-                            }
-                        }
-                    }
-                    //System.out.println("buffer已结束");
-                }
-            });
+            Thread buffer = new Thread(new buffer());
 
-            byte one[] = new byte[1024 * 40];
             buffer.start();
+            byte one[] = new byte[1024 * 40];
             //addData.start();
             while (inputStream.read(one, 0, 1024 * 32) > 0) {
 
@@ -147,14 +105,16 @@ public class KcodeQuestion {
                         break;
                     one[next++] = i;
                 }
+                if(datas.size()>20000){
+                    Thread.sleep(100);
+                }
                 datas.offer(one);
                 one = new byte[1024 * 40];
+
             }
             //System.out.println("加载数据以读取完成");
-            //addData.join();
             buffer.join();
-            es.shutdown();
-            es.awaitTermination(60,TimeUnit.SECONDS);
+            //addData.join();
 
             /**
             long a = new Date().getTime();
@@ -290,6 +250,70 @@ public class KcodeQuestion {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    private class buffer implements Runnable {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int now = 1587987930;
+            List<List> s = new ArrayList<>();
+            while (true) {
+                byte[] data = datas.poll();
+                if(datas == null){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if ((data = datas.poll()) == null) {
+                        break;
+                    }
+                }
+                String[] h;
+                try{
+                    h = new String(data).replaceAll("\u0000","").split("\n");
+                } catch (NullPointerException e){
+                    break;
+                }
+                for(String line:h){
+                    /**
+                    if(++ls%1000000 == 0){
+                        System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size());
+
+                    }
+                     */
+                    String[] a = line.split(",");
+                    if(String.valueOf(Long.parseLong(a[0])/1000).equals(String.valueOf(now))){
+                        List l = new ArrayList();
+                        l.add(now);
+                        l.add(a[1]);
+                        l.add(Integer.parseInt(a[2]));
+                        s.add(l);
+                    } else {
+                        es.submit(new updataTest(s));
+                        s = new ArrayList<>();
+                        now = (int)(Long.parseLong(a[0])/1000);
+                        List l = new ArrayList();
+                        l.add(now);
+                        l.add(a[1]);
+                        l.add(Integer.parseInt(a[2]));
+                        s.add(l);
+                    }
+                }
+            }
+            try {
+                es.shutdown();
+                es.awaitTermination(60,TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //System.out.println("buffer已结束");
         }
     }
 }
