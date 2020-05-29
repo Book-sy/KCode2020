@@ -267,7 +267,7 @@ public class KcodeQuestion {
                 byte[] data = datas.poll();
                 if(datas == null){
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -306,12 +306,6 @@ public class KcodeQuestion {
                         s.add(l);
                     }
                 }
-            }
-            try {
-                es.shutdown();
-                es.awaitTermination(60,TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
             //System.out.println("buffer“—Ω· ¯");
         }
