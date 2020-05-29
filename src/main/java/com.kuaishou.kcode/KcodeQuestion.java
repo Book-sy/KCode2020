@@ -92,11 +92,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 4001];
+            byte one[] = new byte[1024 * 2001];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 4000) > 0) {
+            while (inputStream.read(one, 0, 1024 * 2000) > 0) {
 
-                int next = 1024*4000;
+                int next = 1024*2000;
 
                 byte i;
                 while (true) {
@@ -106,11 +106,11 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
-                while(datas.size()>=160){
+                while(datas.size()>=320){
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 4001];
+                one = new byte[1024 * 2001];
 
             }
             datas.offer(new byte[0]);
@@ -273,13 +273,15 @@ public class KcodeQuestion {
                 h = new String(data).replaceAll("\u0000","").split("\n");
                 for(String line:h){
 
+                    /**
                     if(++ls%1000000 == 0){
                         System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size());
 
                     }
+                     */
 
                     String[] a = line.split(",");
-                    if(String.valueOf(Long.parseLong(a[0])/1000).equals(String.valueOf(now))){
+                    if(Long.parseLong(a[0])/1000 == now){
                         List l = new ArrayList();
                         l.add(now);
                         l.add(a[1]);
