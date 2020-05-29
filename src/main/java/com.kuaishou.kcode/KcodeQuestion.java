@@ -15,7 +15,7 @@ public class KcodeQuestion {
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(16);
 
-    private Queue<byte[]> datas = new LinkedList<>();
+    private Queue<byte[]> datas = new ConcurrentLinkedQueue<>();
 
     private static int ls;
 
