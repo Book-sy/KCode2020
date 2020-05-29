@@ -12,13 +12,17 @@ public class KcodeQuestion {
 
     private Map<Integer, Map<String, List>> map = new ConcurrentHashMap<>();
 
+    private Object lock = new Object();
+
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(16);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
     private static int ls;
+    private static int ls2;
 
+    int a1=0,a2=0,a3=0;
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
      *
@@ -106,17 +110,23 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
-                while(datas.size()>=320){
+                while(datas.size()>=120){
                     Thread.sleep(100);
                 }
                 datas.offer(one);
                 one = new byte[1024 * 2001];
 
             }
+            //System.out.println("总共读取数据包:"+ls2+"个");
             datas.offer(new byte[0]);
             //System.out.println("加载数据以读取完成");
             buffer.join();
             //addData.join();
+
+            while(((ThreadPoolExecutor) es).getActiveCount() != 0){
+                Thread.sleep(100);
+            }
+            //System.out.println(a1+" "+a2+" "+a3);
 
             /**
             long a = new Date().getTime();
@@ -246,7 +256,9 @@ public class KcodeQuestion {
 
                 }
                 //q.offer(map);
-                es.submit(new getResultTest(time,map));
+                synchronized (KcodeQuestion.this) {
+                    es.submit(new getResultTest(time, map));
+                }
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -257,93 +269,117 @@ public class KcodeQuestion {
     private class buffer implements Runnable {
         @Override
         public void run() {
-            int now = 1587987930;
-            List<List> s = new ArrayList<>();
-            Future<String[]> future = null;
-            try {
-                future = es.submit(new format(datas.take()));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            while (true) {
-                String[] h = new String[0];
-                try {
-                    h = future.get();
-                    byte[] n = datas.take();
-                    if(n.length == 0){
-                        for(String line:h){
-                            String[] a = line.split(",");
-                            if(Long.parseLong(a[0])/1000 == now){
-                                List l = new ArrayList();
-                                l.add(now);
-                                l.add(a[1]);
-                                l.add(Integer.parseInt(a[2]));
-                                s.add(l);
-                            } else {
-                                es.submit(new updataTest(s));
-                                s = new ArrayList<>();
-                                now = (int)(Long.parseLong(a[0])/1000);
-                                List l = new ArrayList();
-                                l.add(now);
-                                l.add(a[1]);
-                                l.add(Integer.parseInt(a[2]));
-                                s.add(l);
-                            }
-                        }
-                        break;
+            Future<List<List>> result = null;
+            synchronized (KcodeQuestion.this) {
+                result = es.submit(new Callable<List<List>>() {
+                    @Override
+                    public List<List> call(){
+                        return new ArrayList<>();
                     }
-                    else
-                        future = es.submit(new format(n));
+                });
+            }
+            ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+            while (true) {
+                try {
+                    byte[] n = datas.take();
+                    if(n.length == 0)
+                        break;
+                    else {
+                        synchronized (KcodeQuestion.this) {
+                            result = es.submit(new format(n, result));
+                        }
+                    }
+                    while(tpe.getQueue().size()>=50)
+                        Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                for(String line:h){
-
-                    /**
-                    if(++ls%1000000 == 0){
-                        ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                        int activeCount = tpe.getActiveCount();
-                        System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ activeCount);
-                    }
-                     */
-
-
-                    String[] a = line.split(",");
-                    if(Long.parseLong(a[0])/1000 == now){
-                        List l = new ArrayList();
-                        l.add(now);
-                        l.add(a[1]);
-                        l.add(Integer.parseInt(a[2]));
-                        s.add(l);
-                    } else {
-                        es.submit(new updataTest(s));
-                        s = new ArrayList<>();
-                        now = (int)(Long.parseLong(a[0])/1000);
-                        List l = new ArrayList();
-                        l.add(now);
-                        l.add(a[1]);
-                        l.add(Integer.parseInt(a[2]));
-                        s.add(l);
-                    }
                 }
             }
             //System.out.println("buffer已结束");
         }
     }
 
-    private class format implements Callable<String[]>{
+    private class format implements Callable<List<List>>{
 
         private byte[] data;
+        private Future<List<List>> end;
 
-        public format(byte[] data) {
+        public format(byte[] data,Future<List<List>> end) {
             this.data = data;
+            this.end = end;
         }
 
         @Override
-        public String[] call() throws Exception {
-            return new String(data).replaceAll("\u0000","").split("\n");
+        public List<List> call() {
+            int now = 0;
+            int paNum = 0;
+            List<List> s = new ArrayList<>();
+            String[] h = new String(data).replaceAll("\u0000","").split("\n");
+            List<List> result = new ArrayList<>();
+            boolean one = false;
+            for(String line:h) {
+
+
+                String[] a = line.split(",");
+                //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
+                    //System.out.print("");
+                if(now == 0){
+                    now = (int) (Long.parseLong(a[0]) / 1000);
+                    List l = new ArrayList();
+                    l.add(now);
+                    l.add(a[1]);
+                    l.add(Integer.parseInt(a[2]));
+                    result.add(l);
+                }else if (Long.parseLong(a[0]) / 1000 == now && paNum==0) {
+                    List l = new ArrayList();
+                    l.add(now);
+                    l.add(a[1]);
+                    l.add(Integer.parseInt(a[2]));
+                    result.add(l);
+                } else if (Long.parseLong(a[0]) / 1000 == now) {
+                    List l = new ArrayList();
+                    l.add(now);
+                    l.add(a[1]);
+                    l.add(Integer.parseInt(a[2]));
+                    s.add(l);
+                } else if(paNum == 0) {
+                    paNum++;
+                    now = (int) (Long.parseLong(a[0]) / 1000);
+                    List l = new ArrayList();
+                    l.add(now);
+                    l.add(a[1]);
+                    l.add(Integer.parseInt(a[2]));
+                    s.add(l);
+                } else {
+                    es.submit(new updataTest(s));
+                    one = true;
+                    s = new ArrayList<>();
+                    now = (int) (Long.parseLong(a[0]) / 1000);
+                    List l = new ArrayList();
+                    l.add(now);
+                    l.add(a[1]);
+                    l.add(Integer.parseInt(a[2]));
+                    s.add(l);
+                }
+            }
+            try {
+                if(end.get().size() != 0){
+                    if ((int)end.get().get(0).get(0) == (int)result.get(0).get(0))
+                        result.addAll(end.get());
+                    else {
+                        es.submit(new updataTest(end.get()));
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            if(!one && s.size()==0)
+                return result;
+            else
+                es.submit(new updataTest(result));
+            return s;
         }
     }
 }
