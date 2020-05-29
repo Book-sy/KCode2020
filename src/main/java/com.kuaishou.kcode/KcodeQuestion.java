@@ -92,11 +92,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 2001];
+            byte one[] = new byte[1024 * 4001];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 2000) > 0) {
+            while (inputStream.read(one, 0, 1024 * 4000) > 0) {
 
-                int next = 1024*2000;
+                int next = 1024*4000;
 
                 byte i;
                 while (true) {
@@ -106,11 +106,11 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
-                if(datas.size()>320){
+                while(datas.size()>=160){
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 2001];
+                one = new byte[1024 * 4001];
 
             }
             datas.offer(new byte[0]);
