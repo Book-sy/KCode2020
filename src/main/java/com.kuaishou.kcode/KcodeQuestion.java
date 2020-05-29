@@ -123,7 +123,6 @@ public class KcodeQuestion {
                 es2.submit(new getResultTest((long) i));
                 //System.out.println("已着手处理"+i+"秒级数据");
             }
-
             es2.shutdown();
             es2.awaitTermination(60,TimeUnit.SECONDS);
             System.out.println("处理秒级数据时间："+(new Date().getTime()-a));
