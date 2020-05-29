@@ -15,7 +15,7 @@ public class KcodeQuestion {
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(16);
 
-    private Queue<byte[]> datas = new ConcurrentLinkedQueue<>();
+    private Queue<byte[]> datas = new LinkedBlockingQueue<>();
 
     private static int ls;
 
@@ -255,25 +255,10 @@ public class KcodeQuestion {
     private class buffer implements Runnable {
         @Override
         public void run() {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             int now = 1587987930;
             List<List> s = new ArrayList<>();
             while (true) {
                 byte[] data = datas.poll();
-                if(datas == null){
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if ((data = datas.poll()) == null) {
-                        break;
-                    }
-                }
                 String[] h;
                 try{
                     h = new String(data).replaceAll("\u0000","").split("\n");
@@ -281,12 +266,12 @@ public class KcodeQuestion {
                     break;
                 }
                 for(String line:h){
-                    /**
+
                     if(++ls%1000000 == 0){
                         System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size());
 
                     }
-                     */
+
                     String[] a = line.split(",");
                     if(String.valueOf(Long.parseLong(a[0])/1000).equals(String.valueOf(now))){
                         List l = new ArrayList();
