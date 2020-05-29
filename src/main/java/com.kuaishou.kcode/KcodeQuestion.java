@@ -15,7 +15,7 @@ public class KcodeQuestion {
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(16);
 
-    private Queue<byte[]> datas = new LinkedBlockingQueue<>();
+    private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
     private static int ls;
 
@@ -92,11 +92,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 40];
+            byte one[] = new byte[1024 * 2001];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 32) > 0) {
+            while (inputStream.read(one, 0, 1024 * 2000) > 0) {
 
-                int next = 1024*32;
+                int next = 1024*2000;
 
                 byte i;
                 while (true) {
@@ -105,13 +105,15 @@ public class KcodeQuestion {
                         break;
                     one[next++] = i;
                 }
-                if(datas.size()>20000){
+                //System.out.println("已存入数据");
+                if(datas.size()>320){
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 40];
+                one = new byte[1024 * 2001];
 
             }
+            datas.offer(new byte[0]);
             //System.out.println("加载数据以读取完成");
             buffer.join();
             //addData.join();
@@ -257,14 +259,18 @@ public class KcodeQuestion {
         public void run() {
             int now = 1587987930;
             List<List> s = new ArrayList<>();
+            byte[] data = new byte[0];
             while (true) {
-                byte[] data = datas.poll();
-                String[] h;
-                try{
-                    h = new String(data).replaceAll("\u0000","").split("\n");
-                } catch (NullPointerException e){
+                try {
+                    data = datas.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(data.length == 0){
                     break;
                 }
+                String[] h;
+                h = new String(data).replaceAll("\u0000","").split("\n");
                 for(String line:h){
 
                     if(++ls%1000000 == 0){
