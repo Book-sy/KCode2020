@@ -259,26 +259,56 @@ public class KcodeQuestion {
         public void run() {
             int now = 1587987930;
             List<List> s = new ArrayList<>();
-            byte[] data = new byte[0];
+            Future<String[]> future = null;
+            try {
+                future = es.submit(new format(datas.take()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             while (true) {
+                String[] h = new String[0];
                 try {
-                    data = datas.take();
+                    h = future.get();
+                    byte[] n = datas.take();
+                    if(n.length == 0){
+                        for(String line:h){
+                            String[] a = line.split(",");
+                            if(Long.parseLong(a[0])/1000 == now){
+                                List l = new ArrayList();
+                                l.add(now);
+                                l.add(a[1]);
+                                l.add(Integer.parseInt(a[2]));
+                                s.add(l);
+                            } else {
+                                es.submit(new updataTest(s));
+                                s = new ArrayList<>();
+                                now = (int)(Long.parseLong(a[0])/1000);
+                                List l = new ArrayList();
+                                l.add(now);
+                                l.add(a[1]);
+                                l.add(Integer.parseInt(a[2]));
+                                s.add(l);
+                            }
+                        }
+                        break;
+                    }
+                    else
+                        future = es.submit(new format(n));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
                 }
-                if(data.length == 0){
-                    break;
-                }
-                String[] h;
-                h = new String(data).replaceAll("\u0000","").split("\n");
                 for(String line:h){
 
                     /**
                     if(++ls%1000000 == 0){
-                        System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size());
-
+                        ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+                        int activeCount = tpe.getActiveCount();
+                        System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ activeCount);
                     }
                      */
+
 
                     String[] a = line.split(",");
                     if(Long.parseLong(a[0])/1000 == now){
@@ -300,6 +330,20 @@ public class KcodeQuestion {
                 }
             }
             //System.out.println("buffer已结束");
+        }
+    }
+
+    private class format implements Callable<String[]>{
+
+        private byte[] data;
+
+        public format(byte[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public String[] call() throws Exception {
+            return new String(data).replaceAll("\u0000","").split("\n");
         }
     }
 }
