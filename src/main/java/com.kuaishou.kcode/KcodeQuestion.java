@@ -188,42 +188,6 @@ public class KcodeQuestion {
 
         @Override
         public void run() {
-
-
-            int QPS, P99, P50, AVG, MAX;
-            for (String q : map.keySet()) {
-                List cz = map.get(q);
-                Collections.sort(cz);
-                QPS = cz.size();
-
-
-                double i = QPS * 0.99;
-                if (i - (int) i == 0) {
-                    P99 = (int) cz.get((int) i - 1);
-                    //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
-                } else {
-                    P99 = (int) cz.get((int) Math.ceil(i - 1));
-                }
-
-                i = QPS * 0.5;
-                if (i - (int) i == 0) {
-                    P50 = (int) cz.get((int) i - 1);
-                    //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
-                } else {
-                    P50 = (int) cz.get((int) Math.ceil(i - 1));
-                }
-
-
-                int sum = 0;
-                for (Object z : cz)
-                    sum += (int) z;
-                AVG = (int) Math.ceil(1.0 * sum / QPS);
-                MAX = (int) cz.get(QPS - 1);
-
-                cz.clear();
-                cz.add(""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
-            }
-            KcodeQuestion.this.map.put((int)timestamp.longValue(),map);
         }
     }
 
@@ -256,10 +220,47 @@ public class KcodeQuestion {
                         }
 
                 }
-                //q.offer(map);
+                /**
+                q.offer(map);
                 synchronized (KcodeQuestion.this) {
                     es.submit(new getResultTest(time, map));
                 }
+                 */
+
+                int QPS, P99, P50, AVG, MAX;
+                for (String q : map.keySet()) {
+                    List cz = map.get(q);
+                    Collections.sort(cz);
+                    QPS = cz.size();
+
+
+                    double i = QPS * 0.99;
+                    if (i - (int) i == 0) {
+                        P99 = (int) cz.get((int) i - 1);
+                        //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
+                    } else {
+                        P99 = (int) cz.get((int) Math.ceil(i - 1));
+                    }
+
+                    i = QPS * 0.5;
+                    if (i - (int) i == 0) {
+                        P50 = (int) cz.get((int) i - 1);
+                        //return (int)Math.ceil((double)(cz.get((int)i)+cz.get((int)i-1))/2);
+                    } else {
+                        P50 = (int) cz.get((int) Math.ceil(i - 1));
+                    }
+
+
+                    int sum = 0;
+                    for (Object z : cz)
+                        sum += (int) z;
+                    AVG = (int) Math.ceil(1.0 * sum / QPS);
+                    MAX = (int) cz.get(QPS - 1);
+
+                    cz.clear();
+                    cz.add(""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
+                }
+                KcodeQuestion.this.map.put((int)time,map);
 
             }catch (Exception e){
                 e.printStackTrace();
