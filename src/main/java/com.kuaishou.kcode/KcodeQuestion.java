@@ -137,9 +137,11 @@ public class KcodeQuestion {
             buffer.join();
             //addData.join();
 
+            /**
             while(((ThreadPoolExecutor) es).getActiveCount() != 0){
                 Thread.sleep(100);
             }
+             */
             //System.out.println(a1+" "+a2+" "+a3);
 
             /**
@@ -334,12 +336,12 @@ public class KcodeQuestion {
             boolean one = false;
             for(String line:h) {
 
-                /**
+
                 if(++ls%1000000 == 0){
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                     System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size());
                 }
-                 */
+
 
                 String[] a = line.split(",");
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
