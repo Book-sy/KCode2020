@@ -172,13 +172,15 @@ public class KcodeQuestion {
          System.out.println(num);
          */
 
-        try {
-            return (String) map.get(timestamp.intValue()).get(methodName);
+        //try {
+            return map.get(timestamp.intValue()).get(methodName);
+            /**
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("");
         }
         return null;
+             */
     }
 
     private class updataTest implements Runnable{
