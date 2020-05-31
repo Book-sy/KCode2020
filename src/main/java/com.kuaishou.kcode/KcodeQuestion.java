@@ -124,6 +124,7 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
+
                 datas.offer(one);
                 one = new byte[308244];
 
