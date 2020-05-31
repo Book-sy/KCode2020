@@ -125,6 +125,9 @@ public class KcodeQuestion {
                 }
                 //System.out.println("已存入数据");
 
+                while(datas.size()>=60){
+                    Thread.sleep(10);
+                }
                 datas.offer(one);
                 one = new byte[61300];
 
