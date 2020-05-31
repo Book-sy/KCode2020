@@ -19,6 +19,7 @@ public class KcodeQuestion {
 
     private BlockingQueue<format> formatQueue = new LinkedBlockingQueue<>();
     private BlockingQueue<updataTest> updataTestQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<byte[]> dataQueue = new LinkedBlockingQueue<>();
 
     private static int ls =0;
 
@@ -33,6 +34,30 @@ public class KcodeQuestion {
         new updataTest();
         new format();
         new updataTest();
+        try {
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+            dataQueue.put(new byte[20100]);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -108,7 +133,7 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[20100];
+            byte one[] = dataQueue.take();
             //addData.start();
             int next;
             byte i;
@@ -124,12 +149,9 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
-
-                while(datas.size()>=60){
-                    Thread.sleep(10);
-                }
+                one[next++] = ' ';
                 datas.offer(one);
-                one = new byte[20100];
+                one = dataQueue.take();
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
@@ -330,7 +352,12 @@ public class KcodeQuestion {
             int now = 0;
             int paNum = 0;
             List<List> s = new ArrayList<>();
-            String[] h = new String(data).replaceAll("\u0000","").split("\n");
+            String[] h = new String(data).split(" ")[0].split("\n");
+            try {
+                dataQueue.put(data);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             List<List> result = new ArrayList<>();
             boolean one = false;
             for(String line:h) {
