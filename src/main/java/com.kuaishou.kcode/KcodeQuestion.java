@@ -35,26 +35,8 @@ public class KcodeQuestion {
         new format();
         new updataTest();
         try {
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
-            dataQueue.put(new byte[20100]);
+            for(int i=0;i<40;i++)
+                dataQueue.put(new byte[20100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
