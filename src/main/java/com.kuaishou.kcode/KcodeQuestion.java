@@ -139,6 +139,7 @@ public class KcodeQuestion {
                 one = new byte[1024 * 501];
 
             }
+
             //System.out.println("总共读取数据包:"+ls2+"个");
             datas.offer(new byte[0]);
             //System.out.println("加载数据以读取完成");
