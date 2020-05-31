@@ -284,15 +284,13 @@ public class KcodeQuestion {
     private class buffer implements Runnable {
         @Override
         public void run() {
-            Future<List<List>> result = null;
-            synchronized (KcodeQuestion.this) {
+            Future<List<List>> result;
                 result = es.submit(new Callable<List<List>>() {
                     @Override
                     public List<List> call(){
                         return new ArrayList<>();
                     }
                 });
-            }
             format f;
             while (true) {
                 try {
@@ -303,9 +301,7 @@ public class KcodeQuestion {
                         f = formatQueue.take();
                         f.setData(n);
                         f.setEnd(result);
-                        synchronized (KcodeQuestion.this) {
                             result = es.submit(f);
-                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
