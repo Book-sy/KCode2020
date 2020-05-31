@@ -108,14 +108,14 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[51300];
+            byte one[] = new byte[61300];
             //addData.start();
             int next;
             byte i;
-            while (inputStream.read(one, 0, 51200) > 0) {
+            while (inputStream.read(one, 0, 61200) > 0) {
 
 
-                next = 51200;
+                next = 61200;
 
                 while (true) {
                     i = (byte) inputStream.read();
@@ -126,7 +126,7 @@ public class KcodeQuestion {
                 //System.out.println("已存入数据");
 
                 datas.offer(one);
-                one = new byte[51300];
+                one = new byte[61300];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
@@ -175,7 +175,7 @@ public class KcodeQuestion {
     public String getResult(Long timestamp, String methodName){
         /**
          int num = 0;
-         for(List i:map.get(1587987951).values()){
+         for(List i:map.get(1587987961).values()){
          num+=i.size();
          }
          System.out.println(num);
