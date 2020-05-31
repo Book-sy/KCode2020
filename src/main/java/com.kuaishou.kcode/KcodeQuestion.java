@@ -1,7 +1,5 @@
 package com.kuaishou.kcode;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -45,7 +43,7 @@ public class KcodeQuestion {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(2500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -103,11 +101,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 2001];
+            byte one[] = new byte[1024 * 2501];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 2000) > 0) {
+            while (inputStream.read(one, 0, 1024 * 2500) > 0) {
 
-                int next = 1024*2000;
+                int next = 1024*2500;
 
                 byte i;
                 while (true) {
@@ -121,7 +119,7 @@ public class KcodeQuestion {
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 2001];
+                one = new byte[1024 * 2501];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
@@ -226,13 +224,10 @@ public class KcodeQuestion {
                  */
 
                 int QPS, P99, P50, AVG, MAX;
-                StringBuffer result = new StringBuffer();
                 for (Object q : map.keySet()) {
                     List cz = (List) map.get(q);
                     Collections.sort(cz);
                     QPS = cz.size();
-                    result.append(QPS);
-                    result.append(',');
 
 
                     double i = QPS * 0.99;
@@ -242,8 +237,6 @@ public class KcodeQuestion {
                     } else {
                         P99 = (int) cz.get((int) Math.ceil(i - 1));
                     }
-                    result.append(P99);
-                    result.append(',');
 
                     i = QPS * 0.5;
                     if (i - (int) i == 0) {
@@ -252,21 +245,15 @@ public class KcodeQuestion {
                     } else {
                         P50 = (int) cz.get((int) Math.ceil(i - 1));
                     }
-                    result.append(P50);
-                    result.append(',');
 
 
                     int sum = 0;
                     for (Object z : cz)
                         sum += (int) z;
                     AVG = (int) Math.ceil(1.0 * sum / QPS);
-                    result.append(AVG);
-                    result.append(',');
                     MAX = (int) cz.get(QPS - 1);
-                    result.append(MAX);
 
-                    map.put(q,result.toString());
-                    result.setLength(0);
+                    map.put(q,""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
                 }
                 KcodeQuestion.this.map.put((int)time,map);
 
