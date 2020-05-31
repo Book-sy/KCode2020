@@ -25,17 +25,21 @@ public class KcodeQuestion {
 
     public KcodeQuestion() {
         new format();
-        new updataTest();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
         new format();
         new updataTest();
-        new format();
         new updataTest();
-        new format();
         new updataTest();
-        new format();
+        new updataTest();
         new updataTest();
         try {
-            for(int i=0;i<40;i++)
+            for(int i=0;i<20;i++)
                 dataQueue.put(new byte[20100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -347,9 +351,10 @@ public class KcodeQuestion {
                 /**
                 if(++ls%1000000 == 0){
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                    System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size());
+                    System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                 }
-                */
+                 */
+
 
 
                 String[] a = line.split(",");
