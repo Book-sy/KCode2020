@@ -28,7 +28,7 @@ public class KcodeQuestion {
     private static int ls =0;
 
     public KcodeQuestion() {
-        for(int i=0;i<24;i++)
+        for(int i=0;i<32;i++)
             new format();
         for(int i=0;i<8;i++)
             new updataTest();
@@ -348,8 +348,6 @@ public class KcodeQuestion {
                     System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                 }
                  */
-
-
 
                 String[] a = line.split(",");
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
