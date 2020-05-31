@@ -20,8 +20,13 @@ public class KcodeQuestion {
     private BlockingQueue<format> formatQueue = new LinkedBlockingQueue<>();
     private BlockingQueue<updataTest> updataTestQueue = new LinkedBlockingQueue<>();
 
+    private static int ls =0;
 
     public KcodeQuestion() {
+        new format();
+        new updataTest();
+        new format();
+        new updataTest();
         new format();
         new updataTest();
         new format();
@@ -41,41 +46,41 @@ public class KcodeQuestion {
 
 
             /**
-             Thread addData = new Thread(new Runnable() {
-            @Override
-            public void run() {
-            try {
-            Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            e.printStackTrace();
-            }
-            while(true){
-            Map<Integer, Map<String, List>> map = q.poll();
-            if(map == null){
-            try {
-            Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            e.printStackTrace();
-            }
-            if ((map = q.poll()) == null) {
-            break;
-            }
-            }
-            for(Integer i:map.keySet()){
-            if(KcodeQuestion.this.map.get(i)==null){
-            KcodeQuestion.this.map.put(i,map.get(i));
-            } else {
-            for(String j:map.get(i).keySet()){
-            if(KcodeQuestion.this.map.get(i).get(j)==null){
-            KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
-            } else {
-            KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
-            }
-            }
-            }
-            }
-            }
-            }
+            Thread addData = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    while(true){
+                        Map<Integer, Map<String, List>> map = q.poll();
+                        if(map == null){
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            if ((map = q.poll()) == null) {
+                                break;
+                            }
+                        }
+                        for(Integer i:map.keySet()){
+                            if(KcodeQuestion.this.map.get(i)==null){
+                                KcodeQuestion.this.map.put(i,map.get(i));
+                            } else {
+                                for(String j:map.get(i).keySet()){
+                                    if(KcodeQuestion.this.map.get(i).get(j)==null){
+                                        KcodeQuestion.this.map.get(i).put(j,map.get(i).get(j));
+                                    } else {
+                                        KcodeQuestion.this.map.get(i).get(j).addAll(map.get(i).get(j));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             });  */
 
             /**
@@ -103,11 +108,12 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 501];
+            byte one[] = new byte[1024 * 301];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 500) > 0) {
+            while (inputStream.read(one, 0, 1024 * 300) > 0) {
 
-                int next = 1024*500;
+
+                int next = 1024*300;
 
                 byte i;
                 while (true) {
@@ -117,11 +123,12 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
+
                 while(datas.size()>=120){
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 501];
+                one = new byte[1024 * 301];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
@@ -136,15 +143,15 @@ public class KcodeQuestion {
             //System.out.println(a1+" "+a2+" "+a3);
 
             /**
-             long a = new Date().getTime();
-             ExecutorService es2 = Executors.newFixedThreadPool(16);
-             for(Integer i:map.keySet()) {
-             es2.submit(new getResultTest((long) i));
-             //System.out.println("已着手处理"+i+"秒级数据");
-             }
-             es2.shutdown();
-             es2.awaitTermination(60,TimeUnit.SECONDS);
-             System.out.println("处理秒级数据时间："+(new Date().getTime()-a));
+            long a = new Date().getTime();
+            ExecutorService es2 = Executors.newFixedThreadPool(16);
+            for(Integer i:map.keySet()) {
+                es2.submit(new getResultTest((long) i));
+                //System.out.println("已着手处理"+i+"秒级数据");
+            }
+            es2.shutdown();
+            es2.awaitTermination(60,TimeUnit.SECONDS);
+            System.out.println("处理秒级数据时间："+(new Date().getTime()-a));
              */
 
         } catch (IOException | InterruptedException e) {
@@ -175,14 +182,14 @@ public class KcodeQuestion {
          */
 
         //try {
-        return map.get(timestamp.intValue()).get(methodName);
-        /**
-         } catch(Exception e) {
-         e.printStackTrace();
-         System.out.println("");
-         }
-         return null;
-         */
+            return map.get(timestamp.intValue()).get(methodName);
+            /**
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.out.println("");
+        }
+        return null;
+             */
     }
 
     private class updataTest implements Runnable{
@@ -208,21 +215,21 @@ public class KcodeQuestion {
                     String key = (String)line.get(1);
                     time = (Integer)line.get(0);
 
-                    List z = (List)map.get(key);
-                    if (z == null) {
-                        z = new ArrayList();
-                        z.add((int)line.get(2));
-                        map.put(key, z);
-                    } else {
-                        z.add((int)line.get(2));
-                    }
+                        List z = (List)map.get(key);
+                        if (z == null) {
+                            z = new ArrayList();
+                            z.add((int)line.get(2));
+                            map.put(key, z);
+                        } else {
+                            z.add((int)line.get(2));
+                        }
 
                 }
                 /**
-                 q.offer(map);
-                 synchronized (KcodeQuestion.this) {
-                 es.submit(new getResultTest(time, map));
-                 }
+                q.offer(map);
+                synchronized (KcodeQuestion.this) {
+                    es.submit(new getResultTest(time, map));
+                }
                  */
 
                 int QPS, P99, P50, AVG, MAX;
@@ -286,7 +293,6 @@ public class KcodeQuestion {
                     }
                 });
             }
-            ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
             format f;
             while (true) {
                 try {
@@ -301,8 +307,6 @@ public class KcodeQuestion {
                             result = es.submit(f);
                         }
                     }
-                    while(tpe.getQueue().size()>=50)
-                        Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -334,10 +338,16 @@ public class KcodeQuestion {
             boolean one = false;
             for(String line:h) {
 
+                /**
+                if(++ls%1000000 == 0){
+                    ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+                    System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size());
+                }
+                 */
 
                 String[] a = line.split(",");
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
-                //System.out.print("");
+                    //System.out.print("");
                 if(now == 0){
                     now = (int) (Long.parseLong(a[0]) / 1000);
                     List l = new ArrayList();
