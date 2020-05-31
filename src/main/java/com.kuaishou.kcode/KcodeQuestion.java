@@ -108,14 +108,14 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 301];
+            byte one[] = new byte[51300];
             //addData.start();
             int next;
             byte i;
-            while (inputStream.read(one, 0, 307200) > 0) {
+            while (inputStream.read(one, 0, 51200) > 0) {
 
 
-                next = 307200;
+                next = 51200;
 
                 while (true) {
                     i = (byte) inputStream.read();
@@ -125,11 +125,8 @@ public class KcodeQuestion {
                 }
                 //System.out.println("已存入数据");
 
-                while(datas.size()>=120){
-                    Thread.sleep(10);
-                }
                 datas.offer(one);
-                one = new byte[308244];
+                one = new byte[51300];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
