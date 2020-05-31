@@ -26,6 +26,8 @@ public class KcodeQuestion {
     public KcodeQuestion() {
         new format();
         new updataTest();
+        new format();
+        new updataTest();
     }
 
     /**
