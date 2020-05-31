@@ -28,10 +28,6 @@ public class KcodeQuestion {
         new updataTest();
         new format();
         new updataTest();
-        new format();
-        new updataTest();
-        new format();
-        new updataTest();
     }
 
     /**
