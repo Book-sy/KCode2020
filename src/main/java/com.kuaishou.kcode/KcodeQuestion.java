@@ -13,7 +13,7 @@ public class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(64);
+    private ExecutorService es = Executors.newFixedThreadPool(16);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -24,9 +24,9 @@ public class KcodeQuestion {
     private static int ls =0;
 
     public KcodeQuestion() {
-        for(int i=0;i<64;i++)
-            new format();
         for(int i=0;i<16;i++)
+            new format();
+        for(int i=0;i<8;i++)
             new updataTest();
         try {
             for(int i=0;i<20;i++)
