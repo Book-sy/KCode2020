@@ -188,6 +188,7 @@ public class KcodeQuestion {
             e.printStackTrace();
             System.out.println("");
         }
+
         return null;
              */
     }
@@ -300,6 +301,7 @@ public class KcodeQuestion {
                     f.setEnd(result);
                     result = es.submit(f);
                     //System.out.println("buffer“—Ω· ¯");
+
                 }
             } catch(Exception e){
                 e.printStackTrace();
