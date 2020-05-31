@@ -13,7 +13,7 @@ public class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(16);
+    private ExecutorService es = Executors.newFixedThreadPool(32);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -24,7 +24,7 @@ public class KcodeQuestion {
     private static int ls =0;
 
     public KcodeQuestion() {
-        for(int i=0;i<16;i++)
+        for(int i=0;i<100;i++)
             new format();
         for(int i=0;i<8;i++)
             new updataTest();
@@ -338,12 +338,12 @@ public class KcodeQuestion {
             boolean one = false;
             for(String line:h) {
 
-                /**
+
                 if(++ls%1000000 == 0){
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                     System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                 }
-                 */
+
 
 
                 String[] a = line.split(",");
@@ -405,30 +405,18 @@ public class KcodeQuestion {
                         es.submit(f);
                     }
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            if(!one && s.size()==0) {
-                try {
+                if(!one && s.size()==0) {
                     formatQueue.put(this);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return result;
-            } else {
-                try {
+                    return result;
+                } else {
                     updataTest f = updataTestQueue.take();
                     f.setData(result);
                     es.submit(f);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
-            }
-            try {
                 formatQueue.put(this);
             } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
             return s;
