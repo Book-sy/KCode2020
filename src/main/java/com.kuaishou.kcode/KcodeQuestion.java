@@ -8,7 +8,7 @@ import java.util.concurrent.*;
  * @author kcode
  * Created on 2020-05-20
  */
-public class KcodeQuestion {
+public final class KcodeQuestion {
 
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class KcodeQuestion {
      *
      * @param inputStream
      */
-    public void prepare(InputStream inputStream) {
+    public final void prepare(InputStream inputStream) {
 
         try {
 
@@ -173,7 +173,7 @@ public class KcodeQuestion {
      * @param timestamp  秒级时间戳
      * @param methodName 方法名称
      */
-    public String getResult(Long timestamp, String methodName){
+    public final String getResult(Long timestamp, String methodName){
         /**
          int num = 0;
          for(List i:map.get(1587987961).values()){
@@ -194,7 +194,7 @@ public class KcodeQuestion {
              */
     }
 
-    private class updataTest implements Runnable{
+    private final class updataTest implements Runnable{
 
         private List<List> data;
 
@@ -207,7 +207,7 @@ public class KcodeQuestion {
         }
 
         @Override
-        public void run() {
+        public final void run() {
 
             try {
                 Map map = new HashMap();
@@ -278,14 +278,14 @@ public class KcodeQuestion {
             }
         }
 
-        public void setData(List<List> data) {
+        public final void setData(List<List> data) {
             this.data = data;
         }
     }
 
-    private class buffer implements Runnable {
+    private final class buffer implements Runnable {
         @Override
-        public void run() {
+        public final void run() {
             Future<List<List>> result;
                 result = es.submit(new Callable<List<List>>() {
                     @Override
@@ -310,7 +310,7 @@ public class KcodeQuestion {
         }
     }
 
-    private class format implements Callable<List<List>>{
+    private final class format implements Callable<List<List>>{
 
         private byte[] data;
         private Future<List<List>> end;
@@ -324,7 +324,7 @@ public class KcodeQuestion {
         }
 
         @Override
-        public List<List> call() {
+        public final List<List> call() {
             int now = 0;
             int paNum = 0;
             List<List> s = new ArrayList<>();
@@ -423,11 +423,11 @@ public class KcodeQuestion {
             return s;
         }
 
-        public void setData(byte[] data) {
+        public final void setData(byte[] data) {
             this.data = data;
         }
 
-        public void setEnd(Future<List<List>> end) {
+        public final void setEnd(Future<List<List>> end) {
             this.end = end;
         }
     }
