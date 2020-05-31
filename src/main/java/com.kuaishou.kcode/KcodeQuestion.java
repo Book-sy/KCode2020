@@ -30,6 +30,12 @@ public class KcodeQuestion {
         new updataTest();
         new updataTest();
         new updataTest();
+        new format();
+        new format();
+        new format();
+        new updataTest();
+        new updataTest();
+        new updataTest();
     }
 
     /**
