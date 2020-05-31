@@ -292,22 +292,18 @@ public class KcodeQuestion {
                     }
                 });
             format f;
-            while (true) {
-                try {
-                    byte[] n = datas.take();
-                    if(n.length == 0)
-                        break;
-                    else {
-                        f = formatQueue.take();
-                        f.setData(n);
-                        f.setEnd(result);
-                            result = es.submit(f);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            byte[] n;
+            try{
+                while ((n = datas.take()).length != 0) {
+                    f = formatQueue.take();
+                    f.setData(n);
+                    f.setEnd(result);
+                    result = es.submit(f);
+                    //System.out.println("buffer已结束");
                 }
+            } catch(Exception e){
+                e.printStackTrace();
             }
-            //System.out.println("buffer已结束");
         }
     }
 
