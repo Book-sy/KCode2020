@@ -13,7 +13,7 @@ public class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(16);
+    private ExecutorService es = Executors.newFixedThreadPool(12);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -110,12 +110,13 @@ public class KcodeQuestion {
             buffer.start();
             byte one[] = new byte[1024 * 301];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 300) > 0) {
+            int next;
+            byte i;
+            while (inputStream.read(one, 0, 307200) > 0) {
 
 
-                int next = 1024*300;
+                next = 307200;
 
-                byte i;
                 while (true) {
                     i = (byte) inputStream.read();
                     if(i == '\n' || i ==-1)
@@ -128,7 +129,7 @@ public class KcodeQuestion {
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 301];
+                one = new byte[308244];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
@@ -220,10 +221,10 @@ public class KcodeQuestion {
                         List z = (List)map.get(key);
                         if (z == null) {
                             z = new ArrayList();
-                            z.add((int)line.get(2));
+                            z.add(line.get(2));
                             map.put(key, z);
                         } else {
-                            z.add((int)line.get(2));
+                            z.add(line.get(2));
                         }
 
                 }
@@ -336,12 +337,12 @@ public class KcodeQuestion {
             boolean one = false;
             for(String line:h) {
 
-/**
+                /**
                 if(++ls%1000000 == 0){
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                     System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size());
                 }
- */
+                */
 
 
                 String[] a = line.split(",");
