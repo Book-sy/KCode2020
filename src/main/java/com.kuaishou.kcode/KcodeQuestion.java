@@ -19,10 +19,19 @@ public class KcodeQuestion {
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
-    private static int ls;
-    private static int ls2;
+    private BlockingQueue<format> formatQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<updataTest> updataTestQueue = new LinkedBlockingQueue<>();
 
-    int a1=0,a2=0,a3=0;
+
+    public KcodeQuestion() {
+        new format();
+        new format();
+        new format();
+        new updataTest();
+        new updataTest();
+        new updataTest();
+    }
+
     /**
      * prepare() 方法用来接受输入数据集，数据集格式参考README.md
      *
@@ -195,6 +204,13 @@ public class KcodeQuestion {
 
         private List<List> data;
 
+        public updataTest(){
+            try {
+                updataTestQueue.put(this);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
         public updataTest(List<List> data) {
             this.data = data;
         }
@@ -265,6 +281,15 @@ public class KcodeQuestion {
             }catch (Exception e){
                 e.printStackTrace();
             }
+            try {
+                updataTestQueue.put(this);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void setData(List<List> data) {
+            this.data = data;
         }
     }
 
@@ -281,14 +306,18 @@ public class KcodeQuestion {
                 });
             }
             ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+            format f;
             while (true) {
                 try {
                     byte[] n = datas.take();
                     if(n.length == 0)
                         break;
                     else {
+                        f = formatQueue.take();
+                        f.setData(n);
+                        f.setEnd(result);
                         synchronized (KcodeQuestion.this) {
-                            result = es.submit(new format(n, result));
+                            result = es.submit(f);
                         }
                     }
                     while(tpe.getQueue().size()>=50)
@@ -306,6 +335,13 @@ public class KcodeQuestion {
         private byte[] data;
         private Future<List<List>> end;
 
+        public format(){
+            try {
+                formatQueue.put(this);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
         public format(byte[] data,Future<List<List>> end) {
             this.data = data;
             this.end = end;
@@ -353,7 +389,14 @@ public class KcodeQuestion {
                     l.add(Integer.parseInt(a[2]));
                     s.add(l);
                 } else {
-                    es.submit(new updataTest(s));
+                    updataTest f = null;
+                    try {
+                        f = updataTestQueue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    f.setData(s);
+                    es.submit(f);
                     one = true;
                     s = new ArrayList<>();
                     now = (int) (Long.parseLong(a[0]) / 1000);
@@ -369,7 +412,9 @@ public class KcodeQuestion {
                     if ((int)end.get().get(0).get(0) == (int)result.get(0).get(0))
                         result.addAll(end.get());
                     else {
-                        es.submit(new updataTest(end.get()));
+                        updataTest f = updataTestQueue.take();
+                        f.setData(end.get());
+                        es.submit(f);
                     }
                 }
             } catch (InterruptedException e) {
@@ -377,11 +422,36 @@ public class KcodeQuestion {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            if(!one && s.size()==0)
+            if(!one && s.size()==0) {
+                try {
+                    formatQueue.put(this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return result;
-            else
-                es.submit(new updataTest(result));
+            } else {
+                try {
+                    updataTest f = updataTestQueue.take();
+                    f.setData(result);
+                    es.submit(f);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                formatQueue.put(this);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return s;
+        }
+
+        public void setData(byte[] data) {
+            this.data = data;
+        }
+
+        public void setEnd(Future<List<List>> end) {
+            this.end = end;
         }
     }
 }
