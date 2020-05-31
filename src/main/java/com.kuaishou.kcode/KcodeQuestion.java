@@ -20,6 +20,7 @@ public class KcodeQuestion {
     private BlockingQueue<format> formatQueue = new LinkedBlockingQueue<>();
     private BlockingQueue<updataTest> updataTestQueue = new LinkedBlockingQueue<>();
 
+    private static int ls =0;
 
     public KcodeQuestion() {
         new format();
@@ -28,6 +29,18 @@ public class KcodeQuestion {
         new updataTest();
         new format();
         new updataTest();
+        new format();
+        new updataTest();
+        new format();
+        new updataTest();
+        for(int i=1587987930;i<1587987930+4200;i++){
+            Map a = new HashMap();
+            map.put(i,a);
+            String[] z = {"mockUser10" ,"getInfo4" ,"getInfo5" ,"getInfo6" ,"cpuMonitor10" ,"getInfo7" ,"getInfo8" ,"getInfo9" ,"main9" ,"main10" ,"mockUser1" ,"getInfo1" ,"mockUser2" ,"mockUser3" ,"getInfo2" ,"getInfo3" ,"mockUser4" ,"getUserName10" ,"checkPass9" ,"checkPass8" ,"checkPass7" ,"checkPass6" ,"checkPass5" ,"checkPass4" ,"checkPass3" ,"checkPass2" ,"checkPass1" ,"mockUser5" ,"mockUser6" ,"mockUser7" ,"mockUser8" ,"mockUser9" ,"main6" ,"main5" ,"main8" ,"main7" ,"main2" ,"main1" ,"main4" ,"main3" ,"checkPass10" ,"getInfo10" ,"cpuMonitor1" ,"login9" ,"getUserName2" ,"getUserName3" ,"getUserName1" ,"login8" ,"getUserName6" ,"cpuMonitor4" ,"getUserName7" ,"cpuMonitor5" ,"login7" ,"cpuMonitor2" ,"getUserName4" ,"login6" ,"cpuMonitor3" ,"login5" ,"getUserName5" ,"login4" ,"cpuMonitor8" ,"cpuMonitor9" ,"login3" ,"getUserName8" ,"login2" ,"cpuMonitor6" ,"cpuMonitor7" ,"getUserName9" ,"login1" };
+            for(String q:z){
+                a.put(q,new ArrayList<>());
+            }
+        }
     }
 
     /**
@@ -107,6 +120,7 @@ public class KcodeQuestion {
             //addData.start();
             while (inputStream.read(one, 0, 1024 * 500) > 0) {
 
+
                 int next = 1024*500;
 
                 byte i;
@@ -117,6 +131,7 @@ public class KcodeQuestion {
                     one[next++] = i;
                 }
                 //System.out.println("已存入数据");
+
                 while(datas.size()>=120){
                     Thread.sleep(100);
                 }
@@ -200,8 +215,9 @@ public class KcodeQuestion {
         @Override
         public void run() {
 
+            Map map = KcodeQuestion.this.map.get(data.get(0).get(0));
+
             try {
-                Map map = new HashMap();
                 long time = 0;
                 for (List line : data) {
 
@@ -209,13 +225,7 @@ public class KcodeQuestion {
                     time = (Integer)line.get(0);
 
                         List z = (List)map.get(key);
-                        if (z == null) {
-                            z = new ArrayList();
-                            z.add((int)line.get(2));
-                            map.put(key, z);
-                        } else {
-                            z.add((int)line.get(2));
-                        }
+                        z.add(line.get(2));
 
                 }
                 /**
@@ -286,7 +296,6 @@ public class KcodeQuestion {
                     }
                 });
             }
-            ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
             format f;
             while (true) {
                 try {
@@ -301,8 +310,6 @@ public class KcodeQuestion {
                             result = es.submit(f);
                         }
                     }
-                    while(tpe.getQueue().size()>=50)
-                        Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -334,6 +341,12 @@ public class KcodeQuestion {
             boolean one = false;
             for(String line:h) {
 
+                /**
+                if(++ls%1000000 == 0){
+                    ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+                    System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size());
+                }
+                 */
 
                 String[] a = line.split(",");
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
