@@ -33,6 +33,15 @@ public class KcodeQuestion {
         new format();
         new format();
         new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
+        new format();
         new updataTest();
         new updataTest();
         new updataTest();
