@@ -13,7 +13,7 @@ public class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(10);
+    private ExecutorService es = Executors.newFixedThreadPool(16);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -22,6 +22,12 @@ public class KcodeQuestion {
 
 
     public KcodeQuestion() {
+        new format();
+        new updataTest();
+        new format();
+        new updataTest();
+        new format();
+        new updataTest();
         new format();
         new updataTest();
         new format();
@@ -101,11 +107,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 1001];
+            byte one[] = new byte[1024 * 201];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 1000) > 0) {
+            while (inputStream.read(one, 0, 1024 * 200) > 0) {
 
-                int next = 1024*1000;
+                int next = 1024*200;
 
                 byte i;
                 while (true) {
@@ -119,7 +125,7 @@ public class KcodeQuestion {
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 1001];
+                one = new byte[1024 * 201];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
