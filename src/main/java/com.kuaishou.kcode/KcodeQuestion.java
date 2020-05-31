@@ -10,12 +10,10 @@ import java.util.concurrent.*;
  */
 public class KcodeQuestion {
 
-    private Map<Integer, Map<String, List>> map = new ConcurrentHashMap<>();
-
-    private Object lock = new Object();
+    private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(16);
+    private ExecutorService es = Executors.newFixedThreadPool(10);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -175,27 +173,12 @@ public class KcodeQuestion {
          */
 
         try {
-            return (String) map.get(timestamp.intValue()).get(methodName).get(0);
+            return (String) map.get(timestamp.intValue()).get(methodName);
         } catch(Exception e) {
             e.printStackTrace();
             System.out.println("");
         }
         return null;
-    }
-
-    private class getResultTest implements Runnable {
-
-        private Long timestamp;
-        private Map<String, List> map;
-
-        public getResultTest(Long timestamp,Map<String, List> map) {
-            this.timestamp = timestamp;
-            this.map = map;
-        }
-
-        @Override
-        public void run() {
-        }
     }
 
     private class updataTest implements Runnable{
@@ -208,23 +191,20 @@ public class KcodeQuestion {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        };
-        public updataTest(List<List> data) {
-            this.data = data;
         }
 
         @Override
         public void run() {
 
             try {
-                Map<String, List> map = new HashMap();
+                Map map = new HashMap();
                 long time = 0;
                 for (List line : data) {
 
                     String key = (String)line.get(1);
                     time = (Integer)line.get(0);
 
-                        List z = map.get(key);
+                        List z = (List)map.get(key);
                         if (z == null) {
                             z = new ArrayList();
                             z.add((int)line.get(2));
@@ -242,8 +222,8 @@ public class KcodeQuestion {
                  */
 
                 int QPS, P99, P50, AVG, MAX;
-                for (String q : map.keySet()) {
-                    List cz = map.get(q);
+                for (Object q : map.keySet()) {
+                    List cz = (List) map.get(q);
                     Collections.sort(cz);
                     QPS = cz.size();
 
@@ -271,8 +251,7 @@ public class KcodeQuestion {
                     AVG = (int) Math.ceil(1.0 * sum / QPS);
                     MAX = (int) cz.get(QPS - 1);
 
-                    cz.clear();
-                    cz.add(""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
+                    map.put(q,""+QPS + "," + P99 + "," + P50 + "," + AVG + "," + MAX);
                 }
                 KcodeQuestion.this.map.put((int)time,map);
 
@@ -339,10 +318,6 @@ public class KcodeQuestion {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        };
-        public format(byte[] data,Future<List<List>> end) {
-            this.data = data;
-            this.end = end;
         }
 
         @Override
