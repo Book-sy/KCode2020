@@ -43,7 +43,7 @@ public class KcodeQuestion {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(2500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -101,11 +101,11 @@ public class KcodeQuestion {
             Thread buffer = new Thread(new buffer());
 
             buffer.start();
-            byte one[] = new byte[1024 * 2501];
+            byte one[] = new byte[1024 * 1001];
             //addData.start();
-            while (inputStream.read(one, 0, 1024 * 2500) > 0) {
+            while (inputStream.read(one, 0, 1024 * 1000) > 0) {
 
-                int next = 1024*2500;
+                int next = 1024*1000;
 
                 byte i;
                 while (true) {
@@ -119,7 +119,7 @@ public class KcodeQuestion {
                     Thread.sleep(100);
                 }
                 datas.offer(one);
-                one = new byte[1024 * 2501];
+                one = new byte[1024 * 1001];
 
             }
             //System.out.println("总共读取数据包:"+ls2+"个");
