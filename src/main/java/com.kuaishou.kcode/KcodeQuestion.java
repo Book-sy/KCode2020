@@ -1,5 +1,9 @@
 package com.kuaishou.kcode;
 
+import javafx.collections.transformation.SortedList;
+import sun.awt.util.IdentityArrayList;
+
+import javax.management.relation.RoleList;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -13,7 +17,7 @@ public class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(12);
+    private ExecutorService es = Executors.newFixedThreadPool(32);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -24,29 +28,10 @@ public class KcodeQuestion {
     private static int ls =0;
 
     public KcodeQuestion() {
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new format();
-        new updataTest();
-        new updataTest();
-        new updataTest();
-        new updataTest();
-        new updataTest();
+        for(int i=0;i<24;i++)
+            new format();
+        for(int i=0;i<8;i++)
+            new updataTest();
         try {
             for(int i=0;i<20;i++)
                 dataQueue.put(new byte[20100]);
