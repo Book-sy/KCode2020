@@ -219,7 +219,7 @@ public final class KcodeQuestion {
 
                         List z = (List)map.get(key);
                         if (z == null) {
-                            z = new ArrayList();
+                            z = new ArrayList(5);
                             z.add(line.get(2));
                             map.put(key, z);
                         } else {
@@ -352,32 +352,22 @@ public final class KcodeQuestion {
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
                     //System.out.print("");
                 if(now == 0){
-                    now = (int) (Long.parseLong(a[0]) / 1000);
-                    List l = new ArrayList();
-                    l.add(now);
-                    l.add(a[1]);
-                    l.add(Integer.parseInt(a[2]));
-                    result.add(l);
+                    now = getNow(result, a);
                 }else if (Long.parseLong(a[0]) / 1000 == now && paNum==0) {
-                    List l = new ArrayList();
+                    List l = new ArrayList(5);
                     l.add(now);
                     l.add(a[1]);
                     l.add(Integer.parseInt(a[2]));
                     result.add(l);
                 } else if (Long.parseLong(a[0]) / 1000 == now) {
-                    List l = new ArrayList();
+                    List l = new ArrayList(5);
                     l.add(now);
                     l.add(a[1]);
                     l.add(Integer.parseInt(a[2]));
                     s.add(l);
                 } else if(paNum == 0) {
                     paNum++;
-                    now = (int) (Long.parseLong(a[0]) / 1000);
-                    List l = new ArrayList();
-                    l.add(now);
-                    l.add(a[1]);
-                    l.add(Integer.parseInt(a[2]));
-                    s.add(l);
+                    now = getNow(s, a);
                 } else {
                     updataTest f = null;
                     try {
@@ -389,12 +379,7 @@ public final class KcodeQuestion {
                     es.submit(f);
                     one = true;
                     s = new ArrayList<>();
-                    now = (int) (Long.parseLong(a[0]) / 1000);
-                    List l = new ArrayList();
-                    l.add(now);
-                    l.add(a[1]);
-                    l.add(Integer.parseInt(a[2]));
-                    s.add(l);
+                    now = getNow(s, a);
                 }
             }
             try {
@@ -422,6 +407,17 @@ public final class KcodeQuestion {
                 e.printStackTrace();
             }
             return s;
+        }
+
+        private int getNow(List<List> s, String[] a) {
+            int now;
+            now = (int) (Long.parseLong(a[0]) / 1000);
+            List l = new ArrayList(5);
+            l.add(now);
+            l.add(a[1]);
+            l.add(Integer.parseInt(a[2]));
+            s.add(l);
+            return now;
         }
 
         public final void setData(byte[] data) {
