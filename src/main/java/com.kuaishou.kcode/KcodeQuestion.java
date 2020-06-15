@@ -35,8 +35,9 @@ public final class KcodeQuestion {
             new updataTest();
 
         try {
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 30; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
