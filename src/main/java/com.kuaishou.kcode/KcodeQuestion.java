@@ -1,6 +1,9 @@
 package com.kuaishou.kcode;
 
 import java.io.*;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -28,16 +31,13 @@ public final class KcodeQuestion {
             new format();
         for(int i=0;i<8;i++)
             new updataTest();
+
         try {
             for(int i=0;i<20;i++)
                 dataQueue.put(new byte[20100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        buffer = new Thread(new buffer());
-
-        buffer.start();
     }
 
     /**
@@ -46,11 +46,9 @@ public final class KcodeQuestion {
      * @param inputStream
      */
 
-    Thread buffer;
-
     public final void prepare(InputStream inputStream) {
 
-        try {
+        //try {
 
 
             /**
@@ -112,10 +110,75 @@ public final class KcodeQuestion {
             }).start();
              */
 
-            byte one[] = dataQueue.take();
-            //addData.start();
+
+        Thread buffer = new Thread(new buffer());
+
+        buffer.start();
+
+        byte[] one = new byte[0];
+        try {
+            one = dataQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //addData.start();
             int next;
-            byte i;
+
+            //最新版改进----------start----------------
+            FileInputStream fin = null;
+            try {
+                fin = new FileInputStream(new File("D:\\warmup-test.data"));
+                FileChannel channel = fin.getChannel();
+                next = 20000;
+
+                ByteBuffer bf = ByteBuffer.allocate(next);
+                ByteBuffer l = ByteBuffer.allocate(1);
+
+                while (channel.read(bf) != -1) {
+                    next = 20000;
+                    bf.flip();
+                    try {
+                        bf.get(one, 0, 20000);
+                    } catch (BufferUnderflowException e){
+                        one = bf.array();
+                        datas.offer(one);
+                        break;
+                    }
+                    while(channel.read(l) != -1){
+                        if(l.get(0) == '\n') {
+                            l.clear();
+                            break;
+                        }else
+                            one[next++] = l.get(0);
+                        l.clear();
+                    }
+
+                    bf.clear();
+                    one[next++] = ' ';
+                    datas.offer(one);
+                    one = dataQueue.take();
+                }
+                datas.offer(new byte[0]);
+                channel.close();
+                //System.out.println("已存入数据");
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                if (fin != null) {
+                    try {
+                        fin.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            //最新版改进------------end---------------------
+            /**
             while (inputStream.read(one, 0, 20000) > 0) {
 
 
@@ -138,7 +201,8 @@ public final class KcodeQuestion {
             //System.out.println("加载数据以读取完成");
 
             //addData.join();
-
+             */
+            //旧版改进-----------------------end---------------------------
             /**
             while(((ThreadPoolExecutor) es).getActiveCount() != 0){
                 Thread.sleep(100);
@@ -156,11 +220,10 @@ public final class KcodeQuestion {
             es2.shutdown();
             es2.awaitTermination(60,TimeUnit.SECONDS);
             System.out.println("处理秒级数据时间："+(new Date().getTime()-a));
-             */
-
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+             */
     }
 
     /**
@@ -178,6 +241,7 @@ public final class KcodeQuestion {
          }
          System.out.println(num);
          */
+
         //try {
             return map.get(timestamp.intValue()).get(methodName);
             /**
@@ -330,6 +394,7 @@ public final class KcodeQuestion {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             List<List> result = new ArrayList<>();
             boolean one = false;
             for(String line:h) {
@@ -339,8 +404,9 @@ public final class KcodeQuestion {
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                     System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                 }
-
                  */
+
+
 
 
 
