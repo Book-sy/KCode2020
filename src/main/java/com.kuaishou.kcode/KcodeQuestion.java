@@ -13,7 +13,7 @@ import java.util.concurrent.*;
  */
 public final class KcodeQuestion {
 
-    private int BUFFER_SIZE = 1024 * 64;
+    private int BUFFER_SIZE = 1024 * 6;
 
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
@@ -35,9 +35,8 @@ public final class KcodeQuestion {
             new updataTest();
 
         try {
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 300; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
-            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -116,7 +115,7 @@ public final class KcodeQuestion {
 
         buffer.start();
 
-        byte[] one = new byte[0];
+        byte[] one = null;
         try {
             one = dataQueue.take();
         } catch (InterruptedException e) {
@@ -126,7 +125,6 @@ public final class KcodeQuestion {
         int next;
 
         //最新版改进----------start----------------
-        FileInputStream fin = null;
         try {
             FileChannel channel = ((FileInputStream) inputStream).getChannel();
             next = BUFFER_SIZE;
@@ -134,29 +132,27 @@ public final class KcodeQuestion {
             ByteBuffer bf = ByteBuffer.allocate(next);
             ByteBuffer l = ByteBuffer.allocate(1);
 
-            while (channel.read(bf) != -1) {
-                next = BUFFER_SIZE;
-                bf.flip();
-                try {
-                    bf.get(one, 0, BUFFER_SIZE);
-                } catch (BufferUnderflowException e) {
-                    one = bf.array();
-                    datas.offer(one);
-                    break;
-                }
-                while (channel.read(l) != -1) {
-                    if (l.get(0) == '\n') {
+            try {
+                while (channel.read(bf) != -1) {
+                    next = BUFFER_SIZE;
+                    bf.flip();
+                        bf.get(one, 0, BUFFER_SIZE);
+                    while (channel.read(l) != -1) {
+                        if (l.get(0) == '\n') {
+                            l.clear();
+                            break;
+                        } else
+                            one[next++] = l.get(0);
                         l.clear();
-                        break;
-                    } else
-                        one[next++] = l.get(0);
-                    l.clear();
-                }
+                    }
 
-                bf.clear();
-                one[next++] = ' ';
-                datas.offer(one);
-                one = dataQueue.take();
+                    bf.clear();
+                    one[next++] = ' ';
+                    datas.offer(one);
+                    one = dataQueue.take();
+                }
+            } catch (BufferUnderflowException e) {
+                datas.offer(bf.array());
             }
             datas.offer(new byte[0]);
             //System.out.println("已存入数据");
@@ -379,6 +375,22 @@ public final class KcodeQuestion {
             int now = 0;
             int paNum = 0;
             List<List> s = new ArrayList<>();
+
+            int size = data.length;
+            StringBuffer sb = new StringBuffer();
+            /**
+            for(int i=0;i<size;i++){
+                if(data[i] == '\n'){
+                    h.add(sb.toString());
+                    sb.delete(0,sb.length());
+                } else if(data[i] == ' '){
+                    h.add(sb.toString());
+                    break;
+                } else {
+                    sb.append(data[i]);
+                }
+            }
+             */
             String[] h = new String(data).split(" ")[0].split("\n");
             try {
                 dataQueue.put(data);
@@ -390,12 +402,10 @@ public final class KcodeQuestion {
             boolean one = false;
             for (String line : h) {
 
-                /**
                  if(++ls%1000000 == 0){
                  ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                  System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，data队列数量"+dataQueue.size()+"，datas队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                  }
-                 */
 
 
 
