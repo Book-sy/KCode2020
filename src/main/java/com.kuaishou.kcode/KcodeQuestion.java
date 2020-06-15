@@ -34,6 +34,10 @@ public final class KcodeQuestion {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        buffer = new Thread(new buffer());
+
+        buffer.start();
     }
 
     /**
@@ -41,6 +45,9 @@ public final class KcodeQuestion {
      *
      * @param inputStream
      */
+
+    Thread buffer;
+
     public final void prepare(InputStream inputStream) {
 
         try {
@@ -105,10 +112,6 @@ public final class KcodeQuestion {
             }).start();
              */
 
-
-            Thread buffer = new Thread(new buffer());
-
-            buffer.start();
             byte one[] = dataQueue.take();
             //addData.start();
             int next;
@@ -133,7 +136,7 @@ public final class KcodeQuestion {
             //System.out.println("总共读取数据包:"+ls2+"个");
             datas.offer(new byte[0]);
             //System.out.println("加载数据以读取完成");
-            buffer.join();
+
             //addData.join();
 
             /**
@@ -157,12 +160,6 @@ public final class KcodeQuestion {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -182,6 +179,11 @@ public final class KcodeQuestion {
          System.out.println(num);
          */
 
+        try {
+            buffer.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //try {
             return map.get(timestamp.intValue()).get(methodName);
             /**
