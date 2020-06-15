@@ -13,6 +13,8 @@ import java.util.concurrent.*;
  */
 public final class KcodeQuestion {
 
+    private  int BUFFER_SIZE = 1024*128;
+
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
@@ -34,7 +36,7 @@ public final class KcodeQuestion {
 
         try {
             for(int i=0;i<20;i++)
-                dataQueue.put(new byte[20100]);
+                dataQueue.put(new byte[BUFFER_SIZE+100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -128,16 +130,16 @@ public final class KcodeQuestion {
             FileInputStream fin = null;
             try {
                 FileChannel channel = ((FileInputStream)inputStream).getChannel();
-                next = 20000;
+                next = BUFFER_SIZE;
 
                 ByteBuffer bf = ByteBuffer.allocate(next);
                 ByteBuffer l = ByteBuffer.allocate(1);
 
                 while (channel.read(bf) != -1) {
-                    next = 20000;
+                    next = BUFFER_SIZE;
                     bf.flip();
                     try {
-                        bf.get(one, 0, 20000);
+                        bf.get(one, 0, BUFFER_SIZE);
                     } catch (BufferUnderflowException e){
                         one = bf.array();
                         datas.offer(one);
