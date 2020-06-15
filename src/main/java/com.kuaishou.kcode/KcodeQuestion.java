@@ -127,8 +127,7 @@ public final class KcodeQuestion {
             //最新版改进----------start----------------
             FileInputStream fin = null;
             try {
-                fin = new FileInputStream(new File("D:\\warmup-test.data"));
-                FileChannel channel = fin.getChannel();
+                FileChannel channel = ((FileInputStream)inputStream).getChannel();
                 next = 20000;
 
                 ByteBuffer bf = ByteBuffer.allocate(next);
