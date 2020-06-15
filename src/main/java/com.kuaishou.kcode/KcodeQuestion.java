@@ -178,12 +178,6 @@ public final class KcodeQuestion {
          }
          System.out.println(num);
          */
-
-        try {
-            buffer.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         //try {
             return map.get(timestamp.intValue()).get(methodName);
             /**
