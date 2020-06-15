@@ -160,7 +160,6 @@ public final class KcodeQuestion {
                     one = dataQueue.take();
                 }
                 datas.offer(new byte[0]);
-                channel.close();
                 //System.out.println("已存入数据");
 
             } catch (FileNotFoundException e) {
@@ -169,14 +168,6 @@ public final class KcodeQuestion {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } finally {
-                if (fin != null) {
-                    try {
-                        fin.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
             //最新版改进------------end---------------------
             /**
