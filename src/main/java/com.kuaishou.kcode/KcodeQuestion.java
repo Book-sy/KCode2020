@@ -13,12 +13,12 @@ import java.util.concurrent.*;
  */
 public final class KcodeQuestion {
 
-    private int BUFFER_SIZE = 1024 * 32;
+    private int BUFFER_SIZE = 1024 * 64;
 
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(64);
+    private ExecutorService es = Executors.newFixedThreadPool(32);
 
     private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
