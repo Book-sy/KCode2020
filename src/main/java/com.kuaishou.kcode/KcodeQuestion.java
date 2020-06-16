@@ -22,7 +22,8 @@ public final class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(64);
+    private ExecutorService es = Executors.newFixedThreadPool(32);
+    private ExecutorService upEs = Executors.newFixedThreadPool(100);
 
     //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -35,7 +36,7 @@ public final class KcodeQuestion {
     public KcodeQuestion() {
         for (int i = 0; i < 100; i++)
             new format();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 50; i++)
             new updataTest();
 
         try {
@@ -124,6 +125,7 @@ public final class KcodeQuestion {
         int next;
 
         //最新版改进----------start----------------
+
         try {
             FileChannel channel = ((FileInputStream) inputStream).getChannel();
             next = BUFFER_SIZE;
@@ -132,7 +134,7 @@ public final class KcodeQuestion {
             ByteBuffer l = ByteBuffer.allocate(1);
 
             Future<List<List>> result;
-            result = es.submit(new Callable<List<List>>() {
+            result = upEs.submit(new Callable<List<List>>() {
                 @Override
                 public List<List> call() {
                     return new ArrayList<>();
@@ -160,7 +162,7 @@ public final class KcodeQuestion {
                     f = formatQueue.take();
                     f.setData(one);
                     f.setEnd(result);
-                    result = es.submit(f);
+                    result = upEs.submit(f);
                     //System.out.println("buffer已结束");
 
                     one = dataQueue.take();
@@ -169,7 +171,7 @@ public final class KcodeQuestion {
                 f = formatQueue.take();
                 f.setData(bf.array());
                 f.setEnd(result);
-                result = es.submit(f);
+                upEs.submit(f);
             }
             //System.out.println("已存入数据");
 
@@ -394,10 +396,9 @@ public final class KcodeQuestion {
             for (String line : h) {
 
 
-                /*if (++ls % 1000000 == 0) {
-                    ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                    System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，当前活动线程数：" + tpe.getActiveCount() + "，排队线程数:" + tpe.getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
-                }*/
+                if (++ls % 1000000 == 0) {
+                    System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，UpEs排队线程数:" + ((ThreadPoolExecutor) upEs).getQueue().size() + "，es排队线程数:" + ((ThreadPoolExecutor) es).getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
+                }
 
 
                 String[] a = line.split(",");
