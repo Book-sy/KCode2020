@@ -394,10 +394,10 @@ public final class KcodeQuestion {
             for (String line : h) {
 
 
-                if (++ls % 1000000 == 0) {
+                /*if (++ls % 1000000 == 0) {
                     ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
                     System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，当前活动线程数：" + tpe.getActiveCount() + "，排队线程数:" + tpe.getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
-                }
+                }*/
 
 
                 String[] a = line.split(",");
@@ -483,7 +483,7 @@ public final class KcodeQuestion {
 
     public static List<String> split(byte[] our) {
 
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>(1000);
         int off=-1;
         int size = our.length;
         for(int i=0;i<size;i++){
