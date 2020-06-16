@@ -396,9 +396,9 @@ public final class KcodeQuestion {
             for (String line : h) {
 
 
-                if (++ls % 1000000 == 0) {
+               /* if (++ls % 1000000 == 0) {
                     System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，UpEs排队线程数:" + ((ThreadPoolExecutor) upEs).getQueue().size() + "，es排队线程数:" + ((ThreadPoolExecutor) es).getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
-                }
+                }*/
 
 
                 String[] a = line.split(",");
