@@ -448,9 +448,11 @@ public final class KcodeQuestion {
                 }
             }
             try {
-                if (end.get().size() != 0) {
-                    if ((int) end.get().get(0).get(0) == (int) result.get(0).get(0))
-                        result.addAll(end.get());
+                List<List> re = end.get();
+                formatQueue.put(this);
+                if (re.size() != 0) {
+                    if ((int) re.get(0).get(0) == (int) result.get(0).get(0))
+                        result.addAll(re);
                     else {
                         updataTest f = updataTestQueue.take();
                         f.setData(end.get());
@@ -458,14 +460,12 @@ public final class KcodeQuestion {
                     }
                 }
                 if (!one && s.size() == 0) {
-                    formatQueue.put(this);
                     return result;
                 } else {
                     updataTest f = updataTestQueue.take();
                     f.setData(result);
                     es.submit(f);
                 }
-                formatQueue.put(this);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
