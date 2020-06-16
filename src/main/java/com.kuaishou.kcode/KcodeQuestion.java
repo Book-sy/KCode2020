@@ -393,7 +393,9 @@ public final class KcodeQuestion {
             //旧分割方式 and 自制函数
             //String[] h = new String(data).split(" ")[0].split("\n");
             List<String> h = split(data);
+            Future<List<List>> Newend = end;
             try {
+                formatQueue.put(this);
                 dataQueue.put(data);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -449,8 +451,7 @@ public final class KcodeQuestion {
                 }
             }
             try {
-                List<List> re = end.get();
-                formatQueue.put(this);
+                List<List> re = Newend.get();
                 if (re.size() != 0) {
                     if ((int) re.get(0).get(0) == (int) result.get(0).get(0))
                         result.addAll(re);
