@@ -40,7 +40,7 @@ public final class KcodeQuestion {
             new updataTest();
 
         try {
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < 30; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
