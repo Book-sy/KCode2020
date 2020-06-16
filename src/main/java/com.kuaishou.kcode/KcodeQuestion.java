@@ -33,7 +33,7 @@ public final class KcodeQuestion {
     private static int ls = 0;
 
     public KcodeQuestion() {
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 100; i++)
             new format();
         for (int i = 0; i < 15; i++)
             new updataTest();
