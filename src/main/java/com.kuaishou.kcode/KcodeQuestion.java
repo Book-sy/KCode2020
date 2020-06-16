@@ -23,6 +23,7 @@ public final class KcodeQuestion {
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(32);
+    private ExecutorService formatEs = Executors.newFixedThreadPool(32);
 
     //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -160,7 +161,7 @@ public final class KcodeQuestion {
                     f = formatQueue.take();
                     f.setData(one);
                     f.setEnd(result);
-                    result = es.submit(f);
+                    result = formatEs.submit(f);
                     //System.out.println("buffer已结束");
 
                     one = dataQueue.take();
@@ -169,7 +170,7 @@ public final class KcodeQuestion {
                 f = formatQueue.take();
                 f.setData(bf.array());
                 f.setEnd(result);
-                es.submit(f);
+                formatEs.submit(f);
             }
             //System.out.println("已存入数据");
 
