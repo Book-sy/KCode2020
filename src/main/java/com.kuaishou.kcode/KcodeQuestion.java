@@ -17,7 +17,7 @@ import static jdk.nashorn.internal.objects.NativeString.substring;
  */
 public final class KcodeQuestion {
 
-    private int BUFFER_SIZE = 1024 * 64;
+    private int BUFFER_SIZE = 1024 * 32;
 
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
