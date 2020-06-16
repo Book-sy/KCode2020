@@ -13,14 +13,14 @@ import java.util.concurrent.*;
  */
 public final class KcodeQuestion {
 
-    private int BUFFER_SIZE = 1024 * 6;
+    private int BUFFER_SIZE = 1024 * 64;
 
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(32);
 
-    private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
+    //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
     private BlockingQueue<format> formatQueue = new LinkedBlockingQueue<>();
     private BlockingQueue<updataTest> updataTestQueue = new LinkedBlockingQueue<>();
@@ -35,7 +35,7 @@ public final class KcodeQuestion {
             new updataTest();
 
         try {
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 30; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -110,11 +110,6 @@ public final class KcodeQuestion {
         }).start();
          */
 
-
-        Thread buffer = new Thread(new buffer());
-
-        buffer.start();
-
         byte[] one = null;
         try {
             one = dataQueue.take();
@@ -132,6 +127,15 @@ public final class KcodeQuestion {
             ByteBuffer bf = ByteBuffer.allocate(next);
             ByteBuffer l = ByteBuffer.allocate(1);
 
+            Future<List<List>> result;
+            result = es.submit(new Callable<List<List>>() {
+                @Override
+                public List<List> call() {
+                    return new ArrayList<>();
+                }
+            });
+            format f;
+            byte[] n;
             try {
                 while (channel.read(bf) != -1) {
                     next = BUFFER_SIZE;
@@ -148,13 +152,21 @@ public final class KcodeQuestion {
 
                     bf.clear();
                     one[next++] = ' ';
-                    datas.offer(one);
+
+                            f = formatQueue.take();
+                            f.setData(one);
+                            f.setEnd(result);
+                            result = es.submit(f);
+                            //System.out.println("buffer已结束");
+
                     one = dataQueue.take();
                 }
             } catch (BufferUnderflowException e) {
-                datas.offer(bf.array());
+                f = formatQueue.take();
+                f.setData(bf.array());
+                f.setEnd(result);
+                result = es.submit(f);
             }
-            datas.offer(new byte[0]);
             //System.out.println("已存入数据");
 
         } catch (FileNotFoundException e) {
@@ -330,33 +342,6 @@ public final class KcodeQuestion {
         }
     }
 
-    private final class buffer implements Runnable {
-        @Override
-        public final void run() {
-            Future<List<List>> result;
-            result = es.submit(new Callable<List<List>>() {
-                @Override
-                public List<List> call() {
-                    return new ArrayList<>();
-                }
-            });
-            format f;
-            byte[] n;
-            try {
-                while ((n = datas.take()).length != 0) {
-                    f = formatQueue.take();
-                    f.setData(n);
-                    f.setEnd(result);
-                    result = es.submit(f);
-                    //System.out.println("buffer已结束");
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private final class format implements Callable<List<List>> {
 
         private byte[] data;
@@ -402,10 +387,12 @@ public final class KcodeQuestion {
             boolean one = false;
             for (String line : h) {
 
+                /**
                  if(++ls%1000000 == 0){
                  ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                 System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，data队列数量"+dataQueue.size()+"，datas队列数量"+datas.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
+                 System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，data队列数量"+dataQueue.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
                  }
+                 */
 
 
 
