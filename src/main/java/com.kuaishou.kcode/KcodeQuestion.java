@@ -23,7 +23,6 @@ public final class KcodeQuestion {
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
     private ExecutorService es = Executors.newFixedThreadPool(32);
-    private ExecutorService formatEs = Executors.newFixedThreadPool(32);
 
     //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -34,7 +33,7 @@ public final class KcodeQuestion {
     private static int ls = 0;
 
     public KcodeQuestion() {
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 50; i++)
             new format();
         for (int i = 0; i < 15; i++)
             new updataTest();
@@ -125,7 +124,7 @@ public final class KcodeQuestion {
         int next;
 
         //最新版改进----------start----------------
-        Thread.currentThread().setPriority(9);
+        //Thread.currentThread().setPriority(9);
         try {
             FileChannel channel = ((FileInputStream) inputStream).getChannel();
             next = BUFFER_SIZE;
@@ -161,7 +160,7 @@ public final class KcodeQuestion {
                     f = formatQueue.take();
                     f.setData(one);
                     f.setEnd(result);
-                    result = formatEs.submit(f);
+                    result = es.submit(f);
                     //System.out.println("buffer已结束");
 
                     one = dataQueue.take();
@@ -170,7 +169,7 @@ public final class KcodeQuestion {
                 f = formatQueue.take();
                 f.setData(bf.array());
                 f.setEnd(result);
-                formatEs.submit(f);
+                es.submit(f);
             }
             //System.out.println("已存入数据");
 
