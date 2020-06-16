@@ -6,6 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
+
+import static jdk.nashorn.internal.objects.NativeString.indexOf;
+import static jdk.nashorn.internal.objects.NativeString.substring;
 
 /**
  * @author kcode
@@ -18,7 +22,7 @@ public final class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = Executors.newFixedThreadPool(32);
+    private ExecutorService es = Executors.newFixedThreadPool(64);
 
     //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -140,7 +144,7 @@ public final class KcodeQuestion {
                 while (channel.read(bf) != -1) {
                     next = BUFFER_SIZE;
                     bf.flip();
-                        bf.get(one, 0, BUFFER_SIZE);
+                    bf.get(one, 0, BUFFER_SIZE);
                     while (channel.read(l) != -1) {
                         if (l.get(0) == '\n') {
                             l.clear();
@@ -153,11 +157,11 @@ public final class KcodeQuestion {
                     bf.clear();
                     one[next++] = ' ';
 
-                            f = formatQueue.take();
-                            f.setData(one);
-                            f.setEnd(result);
-                            result = es.submit(f);
-                            //System.out.println("buffer已结束");
+                    f = formatQueue.take();
+                    f.setData(one);
+                    f.setEnd(result);
+                    result = es.submit(f);
+                    //System.out.println("buffer已结束");
 
                     one = dataQueue.take();
                 }
@@ -361,22 +365,24 @@ public final class KcodeQuestion {
             int paNum = 0;
             List<List> s = new ArrayList<>();
 
-            int size = data.length;
-            StringBuffer sb = new StringBuffer();
             /**
-            for(int i=0;i<size;i++){
-                if(data[i] == '\n'){
-                    h.add(sb.toString());
-                    sb.delete(0,sb.length());
-                } else if(data[i] == ' '){
-                    h.add(sb.toString());
-                    break;
-                } else {
-                    sb.append(data[i]);
-                }
-            }
+             int size = data.length;
+             StringBuffer sb = new StringBuffer();
+             for(int i=0;i<size;i++){
+             if(data[i] == '\n'){
+             h.add(sb.toString());
+             sb.delete(0,sb.length());
+             } else if(data[i] == ' '){
+             h.add(sb.toString());
+             break;
+             } else {
+             sb.append(data[i]);
+             }
+             }
              */
-            String[] h = new String(data).split(" ")[0].split("\n");
+            //旧分割方式:自制函数
+            //String[] h = new String(data).split(" ")[0].split("\n");
+            List<String> h = split(data);
             try {
                 dataQueue.put(data);
             } catch (InterruptedException e) {
@@ -387,13 +393,11 @@ public final class KcodeQuestion {
             boolean one = false;
             for (String line : h) {
 
-                /**
-                 if(++ls%1000000 == 0){
-                 ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
-                 System.out.println("已处理"+ls+"，剩余内存："+(Runtime.getRuntime().freeMemory()/1024/1024)+"，data队列数量"+dataQueue.size()+"，当前活动线程数："+ tpe.getActiveCount()+"，排队线程数:"+tpe.getQueue().size()+"，formatQueue："+formatQueue.size()+"，updataQueue："+updataTestQueue.size());
-                 }
-                 */
 
+                if (++ls % 1000000 == 0) {
+                    ThreadPoolExecutor tpe = ((ThreadPoolExecutor) es);
+                    System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，当前活动线程数：" + tpe.getActiveCount() + "，排队线程数:" + tpe.getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
+                }
 
 
                 String[] a = line.split(",");
@@ -475,5 +479,23 @@ public final class KcodeQuestion {
         public final void setEnd(Future<List<List>> end) {
             this.end = end;
         }
+    }
+
+    public static List<String> split(byte[] our) {
+
+        ArrayList<String> list = new ArrayList<>();
+        int off=-1;
+        int size = our.length;
+        for(int i=0;i<size;i++){
+            byte z = our[i];
+            if(z == '\n'){
+                list.add(new String(our,off+1,i-off-1));
+                off = i;
+            } else if(z == ' '){
+                list.add(new String(our,off+1,i-off-1));
+                break;
+            }
+        }
+        return  list;
     }
 }
