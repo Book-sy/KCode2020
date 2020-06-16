@@ -22,7 +22,7 @@ public final class KcodeQuestion {
     private Map<Integer, Map<String, String>> map = new HashMap<>();
 
     //private Queue<Map<Integer, Map<String, List>>> q = new ConcurrentLinkedQueue<>();
-    private ExecutorService es = new ThreadPoolExecutor(0, 64, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+    private ExecutorService es = Executors.newFixedThreadPool(64);
 
     //private BlockingQueue<byte[]> datas = new LinkedBlockingQueue<>();
 
@@ -380,7 +380,7 @@ public final class KcodeQuestion {
              }
              }
              */
-            //旧分割方式:自制函数
+            //旧分割方式 and 自制函数
             //String[] h = new String(data).split(" ")[0].split("\n");
             List<String> h = split(data);
             try {
@@ -391,9 +391,13 @@ public final class KcodeQuestion {
 
             List<List> result = new ArrayList<>();
             boolean one = false;
-            for (String line : h) {
+            //改用迭代器 替换 增强for
+            //for (String line : h) {
+            Iterator iterator = h.iterator();
+            String line;
+            while (iterator.hasNext()){
 
-
+                line = (String)iterator.next();
                 /*if (++ls % 1000000 == 0) {
                     System.out.println("已处理" + ls + "，剩余内存：" + (Runtime.getRuntime().freeMemory() / 1024 / 1024) + "，data队列数量" + dataQueue.size() + "，es排队线程数:" + ((ThreadPoolExecutor) es).getQueue().size() + "，formatQueue：" + formatQueue.size() + "，updataQueue：" + updataTestQueue.size());
                 }*/
