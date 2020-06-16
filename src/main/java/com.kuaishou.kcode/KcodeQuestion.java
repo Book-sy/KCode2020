@@ -416,23 +416,24 @@ public final class KcodeQuestion {
                 String[] a = line.split(",");
                 //if((Long.parseLong(a[0])/1000)==(long)1587989822 && a[1].equals("getInfo1"))
                 //System.out.print("");
+                boolean t = (Long.parseLong(a[0]) / 1000 == now);
                 if (now == 0) {
                     now = getNow(result, a);
-                } else if (Long.parseLong(a[0]) / 1000 == now && paNum == 0) {
+                } else if (t && paNum == 0) {
                     List l = new ArrayList(5);
                     l.add(now);
                     l.add(a[1]);
                     l.add(Integer.parseInt(a[2]));
                     result.add(l);
-                } else if (Long.parseLong(a[0]) / 1000 == now) {
+                } else if (paNum == 0) {
+                    paNum++;
+                    now = getNow(s, a);
+                } else if (t) {
                     List l = new ArrayList(5);
                     l.add(now);
                     l.add(a[1]);
                     l.add(Integer.parseInt(a[2]));
                     s.add(l);
-                } else if (paNum == 0) {
-                    paNum++;
-                    now = getNow(s, a);
                 } else {
                     updataTest f = null;
                     try {
