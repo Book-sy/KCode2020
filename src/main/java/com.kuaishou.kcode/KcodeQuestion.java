@@ -275,8 +275,12 @@ public final class KcodeQuestion {
             try {
                 Map map = new HashMap();
                 long time = 0;
-                for (List line : data) {
-
+                //改用迭代器 替换 增强for
+                //for (List line : data) {
+                Iterator iterator = data.iterator();
+                List line;
+                while (iterator.hasNext()){
+                    line = (List)iterator.next();
                     String key = (String) line.get(1);
                     time = (Integer) line.get(0);
 
@@ -298,7 +302,12 @@ public final class KcodeQuestion {
                  */
 
                 int QPS, P99, P50, AVG, MAX;
-                for (Object q : map.keySet()) {
+                //改用迭代器 替换 增强for
+                //for (Object q : map.keySet()) {
+                iterator = map.keySet().iterator();
+                Object q;
+                while (iterator.hasNext()){
+                    q = iterator.next();
                     List cz = (List) map.get(q);
                     Collections.sort(cz);
                     QPS = cz.size();
