@@ -39,7 +39,7 @@ public final class KcodeQuestion {
             new updataTest();
 
         try {
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 40; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -483,7 +483,7 @@ public final class KcodeQuestion {
 
     public static List<String> split(byte[] our) {
 
-        ArrayList<String> list = new ArrayList<>(1000);
+        ArrayList<String> list = new ArrayList<>(500);
         int off=-1;
         int size = our.length;
         for(int i=0;i<size;i++){
