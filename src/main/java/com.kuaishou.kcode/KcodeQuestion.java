@@ -33,13 +33,13 @@ public final class KcodeQuestion {
     private static int ls = 0;
 
     public KcodeQuestion() {
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 20; i++)
             new format();
         for (int i = 0; i < 15; i++)
             new updataTest();
 
         try {
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 20; i++)
                 dataQueue.put(new byte[BUFFER_SIZE + 100]);
         } catch (InterruptedException e) {
             e.printStackTrace();

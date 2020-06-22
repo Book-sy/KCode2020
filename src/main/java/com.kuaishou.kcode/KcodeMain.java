@@ -11,13 +11,13 @@ public class KcodeMain {
 
     public static void main(String[] args) throws Exception {
         Date start = new Date();
-        // "demo.data" æ˜¯ä½ ä»ç½‘ç›˜ä¸Šä¸‹è½½çš„æµ‹è¯•æ•°æ®ï¼Œè¿™é‡Œç›´æ¥å¡«ä½ çš„æœ¬åœ°ç»å¯¹è·¯å¾„
-        InputStream fileInputStream = new FileInputStream("I:\\data\\warmup-test.data");
+        // "demo.data" ÊÇÄã´ÓÍøÅÌÉÏÏÂÔØµÄ²âÊÔÊı¾İ£¬ÕâÀïÖ±½ÓÌîÄãµÄ±¾µØ¾ø¶ÔÂ·¾¶
+        InputStream fileInputStream = new FileInputStream("D:\\warmup-test.data");
         KcodeQuestion question = new KcodeQuestion();
-        // å‡†å¤‡æ•°æ®
+        // ×¼±¸Êı¾İ
         question.prepare(fileInputStream);
-        System.out.println("è¯»å–æ•°æ®å®Œæˆï¼Œæ€»è€—æ—¶:"+(new Date().getTime()-start.getTime()));
-        // éªŒè¯æ­£ç¡®æ€§
+        System.out.println("¶ÁÈ¡Êı¾İÍê³É£¬×ÜºÄÊ±:"+(-(start.getTime()-(start = new Date()).getTime())));
+        // ÑéÖ¤ÕıÈ·ĞÔ
         BufferedReader br = null;
         try {
             int success=0,fail=0;
@@ -33,12 +33,12 @@ public class KcodeMain {
                     //System.out.println("success");
                 } else {
                     fail++;
-                    System.out.println("fail:  "+s[1]+"  "+result);
+                    System.out.println("fail:  "+s1[0]+" "+s1[1]+" "+s[1]+"  "+result);
                     question.getResult(Long.parseLong(s1[0]), s1[1]);
                 }
             }
-            System.out.println("æ­£ç¡®/å¤±è´¥: "+success+"/"+fail);
-            System.out.println("éªŒè¯å®Œæˆï¼Œæ€»è€—æ—¶:"+(new Date().getTime()-start.getTime()));
+            System.out.println("ÕıÈ·/Ê§°Ü: "+success+"/"+fail);
+            System.out.println("ÑéÖ¤Íê³É£¬ÑéÖ¤ºÄÊ±:"+(new Date().getTime()-start.getTime()));
         } catch (IOException e){
             e.printStackTrace();
         } finally {
